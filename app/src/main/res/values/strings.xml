@@ -1,0 +1,11 @@
+<resources>
+
+  <!-- General -->
+  <string name="app_name">"DigiReceipt"</string>
+  <string name="add_a_receipt">Add a Receipt</string>
+  <string name="view_receipts">View Receipts</string>
+
+  <!-- Splash Screen -->
+  <string name="loading">loading</string>
+
+</resources>
