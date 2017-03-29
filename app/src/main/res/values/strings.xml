@@ -8,4 +8,7 @@
   <!-- Splash Screen -->
   <string name="loading">loading</string>
 
+  <!-- Search -->
+  <string name="search">search</string>
+
 </resources>
