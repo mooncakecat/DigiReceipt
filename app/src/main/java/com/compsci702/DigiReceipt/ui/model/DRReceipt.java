@@ -6,5 +6,5 @@ package com.compsci702.DigiReceipt.ui.model;
 public interface DRReceipt {
     int getId();
 
-    int getFilename();
+    String getFilename();
 }

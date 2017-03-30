@@ -40,4 +40,6 @@ dependencies {
   // ormlite
   compile 'com.j256.ormlite:ormlite-android:4.48'
 
+  // glide
+  compile 'com.github.bumptech.glide:glide:3.7.0'
 }

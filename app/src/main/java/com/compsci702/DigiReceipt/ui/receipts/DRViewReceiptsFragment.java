@@ -30,7 +30,7 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
     public interface FragmentListener {
     }
 
-    private final int GRID_COLUMNS = 4;
+    private final int GRID_COLUMNS = 2;
 
     private DRReceiptsRecyclerViewAdapter mAdapter;
     private final List<DRReceipt> mReceipts = new ArrayList<>();
@@ -55,6 +55,19 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
     }
 
     @Override protected void onViewCreated(Bundle savedInstanceState) {
+      // FIXME: 3/31/2017 Add dummy data
+      DRReceipt receipt = new DRReceipt() {
+        @Override public int getId() {
+          return 0;
+        }
+
+        @Override public String getFilename() {
+          return "sample.png";
+        }
+      };
+
+      mReceipts.add(receipt);
+
         mAdapter = new DRReceiptsRecyclerViewAdapter(getActivity(), mReceipts, this);
 
         final GridLayoutManager layoutManager = new GridLayoutManager(getContext(), GRID_COLUMNS);
