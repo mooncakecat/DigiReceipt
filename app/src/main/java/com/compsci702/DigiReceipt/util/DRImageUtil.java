@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 public class DRImageUtil {
 
   // FIXME: 3/31/2017 replace with correct folder
-  private static final String URL_ASSETS_IMAGE_FOLDER = "file:///android_asset/images/";
+  private static final String URL_ASSETS_IMAGE_FOLDER = "file:///";
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * getImageUrl

@@ -3,6 +3,7 @@ package com.compsci702.DigiReceipt.ui.receipts;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +30,7 @@ class DRReceiptsRecyclerViewAdapter extends RecyclerView.Adapter<DRReceiptsRecyc
     @NonNull private final AdapterListener mAdapterListener;
 
     interface AdapterListener {
-        void onReceiptSelected();
+        void onReceiptSelected(String receiptFilename);
     }
 
     DRReceiptsRecyclerViewAdapter(@NonNull Context context, @NonNull List<DRReceipt> receiptsList,
@@ -60,8 +61,9 @@ class DRReceiptsRecyclerViewAdapter extends RecyclerView.Adapter<DRReceiptsRecyc
 
     static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        AdapterListener mAdapterListener;
-        Context mContext;
+        @NonNull AdapterListener mAdapterListener;
+        @NonNull Context mContext;
+        @Nullable DRReceipt mReceipt;
 
         @BindView(R.id.receipt_thumbnail_imageview) DRSquareImageView mThumbnailView;
 
@@ -71,15 +73,18 @@ class DRReceiptsRecyclerViewAdapter extends RecyclerView.Adapter<DRReceiptsRecyc
             mAdapterListener = adapterListener;
 
             ButterKnife.bind(this, view);
+            view.setOnClickListener(this);
         }
 
         public void updateView(@NonNull DRReceipt receipt) {
+          mReceipt = receipt;
           String thumbnailURL = DRImageUtil.getImageUrl(receipt.getFilename());
           Glide.with(mContext).load(Uri.parse(thumbnailURL)).asBitmap().centerCrop().into(mThumbnailView);
         }
 
         @Override public void onClick(View view) {
-            mAdapterListener.onReceiptSelected();
+          if (mReceipt == null) throw new IllegalStateException("onClick() called on null image");
+            mAdapterListener.onReceiptSelected(mReceipt.getFilename());
         }
     }
 }
