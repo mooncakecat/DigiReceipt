@@ -4,15 +4,18 @@ import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.compsci702.DigiReceipt.database.DRDbHelper;
+
 /**
  * Application class.
  */
-public class DRApplication extends Application {
+public class  DRApplication extends Application {
 
   private static DRApplication sInstance;
   private static DRApplicationHub sApplicationHub;
   private static DRDatabaseHub sDatabaseHub;
   private static DRNetworkHub sNetworkHub;
+  private static DRDbHelper sDbHelper;
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * constructor
@@ -66,6 +69,19 @@ public class DRApplication extends Application {
     return sDatabaseHub;
   }
 
+  /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	 * db helper
+	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+  /**
+   * Get the db helper.
+   *
+   * @return the db helper.
+   */
+  @NonNull public static DRDbHelper getDbHelper() {
+    if (sDbHelper == null) sDbHelper = new DRDbHelper(getContext());
+    return sDbHelper;
+  }
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	 * network hub
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

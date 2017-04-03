@@ -1,21 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="horizontal">
 
-  <Button
-    android:id="@+id/add_receipt_button"
-    android:text="@string/add_a_receipt"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAllCaps="false"/>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+    </LinearLayout>
 
-  <Button
-    android:id="@+id/view_receipts_button"
-    android:text="@string/view_receipts"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAllCaps="false"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/add_receipt_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_a_receipt"
+            android:textAllCaps="false"/>
+
+        <Button
+            android:id="@+id/view_receipts_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/view_receipts"
+            android:textAllCaps="false"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+    </LinearLayout>
 
 </LinearLayout>
