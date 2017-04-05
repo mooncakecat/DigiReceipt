@@ -39,7 +39,6 @@ public abstract class DRBaseFragment<L> extends Fragment {
 
   protected abstract void updateView();
 
-
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * lifecycle
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -68,7 +67,10 @@ public abstract class DRBaseFragment<L> extends Fragment {
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     View view = getContentView(inflater, container);
     mBinder = ButterKnife.bind(this, view);
+
+    onViewCreated(savedInstanceState);
     updateView();
+
     return view;
   }
 
