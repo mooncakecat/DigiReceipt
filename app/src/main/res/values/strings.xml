@@ -8,4 +8,11 @@
   <!-- Splash Screen -->
   <string name="loading">loading</string>
 
+  <!-- Search -->
+  <string name="search">search</string>
+
+  <!-- Take pictures -->
+  <string name="permissions_error">Permissions Error</string>
+  <string name="image_saved">Image saved!</string>
+
 </resources>
