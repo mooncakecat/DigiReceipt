@@ -39,13 +39,13 @@ public class DRApplicationHub {
 	 *
 	 * @param receipt The receipt to add to DRDbReceiptDetails.
 	 */
-	public void addFavouriteLocation(@NonNull DRReceipt receipt) {
+	public void addReceipt(@NonNull DRReceipt receipt) {
 		mDatabaseHub.addReceipt(receipt)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(new Observer<DRDbReceiptDetails>() {
-					@Override public void onNext(DRDbReceiptDetails favouriteLocation) {
-						Log.d(TAG, "location added successfully: " + favouriteLocation);
+					@Override public void onNext(DRDbReceiptDetails receipt) {
+						Log.d(TAG, "Receipt added successfully: " + receipt);
 					}
 
 					@Override public void onCompleted() {
@@ -53,7 +53,7 @@ public class DRApplicationHub {
 					}
 
 					@Override public void onError(Throwable e) {
-						Log.e(TAG, "error in addFavouriteLocation", e);
+						Log.e(TAG, "error in addReceipt", e);
 					}
 				});
 	}

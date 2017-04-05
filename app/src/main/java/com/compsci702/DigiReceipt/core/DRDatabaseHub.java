@@ -75,7 +75,7 @@ public class DRDatabaseHub {
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	 * get favourite locations
+	 * get receipts
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     /**
