@@ -1,5 +1,6 @@
 package com.compsci702.DigiReceipt.core;
 
+import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 import com.google.api.client.util.Base64;
 import com.google.gson.Gson;
 import java.io.BufferedWriter;
@@ -11,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Scanner;
+
 /**
  * Network Hub.
  */
@@ -18,9 +20,10 @@ public class DRNetworkHub {
 
     private static final String TARGET_URL = "https://vision.googleapis.com/v1/images:annotate?";
     private static final String API_KEY = "key=AIzaSyBa8Ozp8y9v8NQixUMMDKX58a9dHQe4rSo";
-    Gson gson = new Gson();
 
-    private byte[] readBytesFromFile(String filePath) {
+    static Gson gson = new Gson();
+
+    private static byte[] readBytesFromFile(String filePath) {
 
         FileInputStream fileInputStream = null;
         byte[] bytesArray = null;
@@ -43,7 +46,7 @@ public class DRNetworkHub {
         return bytesArray;
     }
 
-    private ReceiptText sendPost(String filePath) throws Exception {
+    public static DRReceipt sendPost(String filePath) throws Exception {
 
         byte[] fileContent = readBytesFromFile(filePath);
         URL serverUrl = new URL(TARGET_URL + API_KEY);
@@ -74,24 +77,13 @@ public class DRNetworkHub {
         while (httpResponseScanner.hasNext()) {
             String line = httpResponseScanner.nextLine();
             if(line.contains("text")){
-
                 temp = line;
             }
         }
 
         httpResponseScanner.close();
-        System.out.println(temp);
-          ReceiptText rt = (ReceiptText) gson.fromJson("{"+ temp + "}", Class.forName("ReceiptText"));
-        return  rt ;
+
+        return (DRReceipt) gson.fromJson("{"+ temp + "}", Class.forName("DRReceipt"));
     }
 
-    class ReceiptText{
-        private String text ="";
-        public ReceiptText(){
-
-        }
-        public String getText(){
-            return text;
-        }
-    }
 }

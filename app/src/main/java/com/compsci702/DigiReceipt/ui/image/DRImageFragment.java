@@ -88,6 +88,10 @@ public class DRImageFragment extends DRBaseFragment<DRImageFragment.FragmentList
 				@Override public String getFilename() {
 					return filePath;
 				}
+
+				@Override public String getText() {
+					return null;
+				}
 			};
 			mReceipts.add(receipt);
 		}

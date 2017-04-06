@@ -17,9 +17,10 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.compsci702.DigiReceipt.R;
+import com.compsci702.DigiReceipt.core.DRNetworkHub;
 import com.compsci702.DigiReceipt.ui.base.DRBaseFragment;
 import com.compsci702.DigiReceipt.ui.main.DRMainFragment;
-import com.compsci702.DigiReceipt.ui.receipts.DRAddReceiptFragment;
+import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 import com.compsci702.DigiReceipt.ui.receipts.DRViewReceiptsFragment;
 import com.compsci702.DigiReceipt.util.DRFileUtil;
 
@@ -27,7 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class DRMainActivity extends AppCompatActivity implements DRMainFragment.FragmentListener,
-		DRAddReceiptFragment.FragmentListener, DRViewReceiptsFragment.FragmentListener {
+        DRViewReceiptsFragment.FragmentListener {
 
   	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   	 * internal fields
@@ -35,9 +36,11 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
 	static final int REQUEST_IMAGE_CAPTURE = 1;
 	static final int REQUEST_CODE = 5;
+    public static Uri uri = null;
 
 	@BindView(R.id.fragment_container) FrameLayout mFragmentContainer;
 	@BindView(R.id.toolbar) Toolbar mToolbar;
+
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * lifecycle methods
@@ -123,6 +126,7 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 		// Ensure that there's a camera activity to handle the intent
 		if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 			Uri pictureURI = Uri.fromFile(DRFileUtil.generateMediaFile());
+            uri = pictureURI;
 			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, pictureURI);
 			startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 		}
@@ -131,7 +135,14 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 	@Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 			Toast.makeText(this, R.string.image_saved, Toast.LENGTH_SHORT).show();
-		}
+            try {
+                DRReceipt receipt = DRNetworkHub.sendPost(uri.toString());
+                Toast.makeText(this, receipt.getText(), Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
 	}
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
