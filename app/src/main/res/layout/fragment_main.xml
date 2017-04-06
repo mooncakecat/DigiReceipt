@@ -22,13 +22,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add_a_receipt"
-            android:textAllCaps="false"/>
+            android:textAllCaps="false"
+            android:layout_margin="@dimen/grid_1"/>
 
         <Button
             android:id="@+id/view_receipts_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/view_receipts"
+            android:layout_margin="@dimen/grid_1"
             android:textAllCaps="false"/>
     </LinearLayout>
 
