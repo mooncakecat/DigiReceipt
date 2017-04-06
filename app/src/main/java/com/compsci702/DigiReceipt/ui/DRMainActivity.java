@@ -26,6 +26,9 @@ import com.compsci702.DigiReceipt.util.DRFileUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class DRMainActivity extends AppCompatActivity implements DRMainFragment.FragmentListener,
         DRViewReceiptsFragment.FragmentListener {
@@ -136,15 +139,38 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 		if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 			Toast.makeText(this, R.string.image_saved, Toast.LENGTH_SHORT).show();
             try {
-                DRReceipt receipt = DRNetworkHub.sendPost(uri.toString());
-                Toast.makeText(this, receipt.getText(), Toast.LENGTH_SHORT).show();
+                getTextFromObservable(uri.toString());
+				//System.out.println(uri.toString());
+               // DRReceipt receipt = DRNetworkHub.sendPost(uri.toString());
+               // Toast.makeText(this, receipt.getText(), Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
 	}
+    private void getTextFromObservable(String uriForFilePath){
+        DRNetworkHub.httpObservable(uriForFilePath.toString()).
+                subscribeOn(Schedulers.newThread()).
+                observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<DRReceipt>() {
+            @Override
+            public void onCompleted() {
 
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(DRReceipt receipt) {
+                //Toast.makeText(this, receipt.getText(), Toast.LENGTH_SHORT).show();
+				//Here you will receive the instance of DRReceipt, I'm not sure what to do next.
+            }
+        });
+
+    }
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * general methods
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

@@ -3,6 +3,7 @@ package com.compsci702.DigiReceipt.core;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 import com.google.api.client.util.Base64;
 import com.google.gson.Gson;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +13,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Scanner;
+
+import rx.Observable;
+import rx.Subscriber;
+
+//import java.util.Observable;
+//import rx.observables.*;
 
 /**
  * Network Hub.
@@ -24,7 +31,6 @@ public class DRNetworkHub {
     static Gson gson = new Gson();
 
     private static byte[] readBytesFromFile(String filePath) {
-
         FileInputStream fileInputStream = null;
         byte[] bytesArray = null;
         try {
@@ -86,4 +92,17 @@ public class DRNetworkHub {
         return (DRReceipt) gson.fromJson("{"+ temp + "}", Class.forName("DRReceipt"));
     }
 
+    public static rx.Observable<DRReceipt> httpObservable(final String filePath){
+        return Observable.create(new Observable.OnSubscribe<DRReceipt>() {
+            @Override
+            public void call(Subscriber<? super DRReceipt> subscriber) {
+                try {
+                    subscriber.onNext(sendPost(filePath));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                subscriber.onCompleted();
+            }
+        });
+    }
 }
