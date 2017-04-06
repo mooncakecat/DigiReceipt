@@ -3,7 +3,7 @@ package com.compsci702.DigiReceipt.core;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.compsci702.DigiReceipt.database.DRDbReceiptDetails;
+import com.compsci702.DigiReceipt.database.DRReceiptDb;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 
 import java.util.List;
@@ -35,16 +35,16 @@ public class DRApplicationHub {
 	}
 
 	/**
-	 * Starts an observable, in the background, that adds the receipt to DRDbReceiptDetails.
+	 * Starts an observable, in the background, that adds the receipt to DRReceiptDb.
 	 *
-	 * @param receipt The receipt to add to DRDbReceiptDetails.
+	 * @param receipt The receipt to add to DRReceiptDb.
 	 */
 	public void addReceipt(@NonNull DRReceipt receipt) {
 		mDatabaseHub.addReceipt(receipt)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(new Observer<DRDbReceiptDetails>() {
-					@Override public void onNext(DRDbReceiptDetails receipt) {
+				.subscribe(new Observer<DRReceiptDb>() {
+					@Override public void onNext(DRReceiptDb receipt) {
 						Log.d(TAG, "Receipt added successfully: " + receipt);
 					}
 

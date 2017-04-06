@@ -18,30 +18,28 @@ import com.j256.ormlite.table.TableUtils;
 
 public class DRDbHelper extends OrmLiteSqliteOpenHelper{
 
-    /************************************************
-     * Suggested Copy/Paste code. Everything from here to the done block.
-     ************************************************/
-
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	 * public constants
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    private static final String DATABASE_NAME = "receiptDb.db";
+    private static final String DATABASE_NAME = "receipt_db";
+
     private static final int DATABASE_VERSION = 1;
+
     private Map<Class<?>, Dao<?, ?>> mTableMap = new HashMap<>();
-    private Dao<DRDbReceiptDetails, Integer> receiptDao;
+
+    public static final String TABLE_RECEIPT = "TABLE_RECEIPT";
+
+    //private Dao<DRReceiptDb, Integer> receiptDao;
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	 * constructor
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     public DRDbHelper(Context context) {
-        super(context, context.getString(R.string.app_name), null, DATABASE_VERSION, R.raw.ormlite_config);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION, R.raw.ormlite_config);
     }
 
-    /************************************************
-     * Suggested Copy/Paste Done
-     ************************************************/
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	 * on create
@@ -52,7 +50,7 @@ public class DRDbHelper extends OrmLiteSqliteOpenHelper{
         try {
 
             // Create tables. This onCreate() method will be invoked only once of the application life time i.e. the first time when the application starts.
-            TableUtils.createTable(connectionSource, DRDbReceiptDetails.class);
+            TableUtils.createTable(connectionSource, DRReceiptDb.class);
 
         } catch (SQLException e) {
             Log.e(DRDbHelper.class.getName(), "Unable to create databases", e);
@@ -71,7 +69,7 @@ public class DRDbHelper extends OrmLiteSqliteOpenHelper{
             //automatically. Developer needs to handle the upgrade logic here, i.e. create a new table or a new column to an existing table, take the backups of the
             // existing database etc.
 
-            TableUtils.dropTable(connectionSource, DRDbReceiptDetails.class, true);
+            TableUtils.dropTable(connectionSource, DRReceiptDb.class, true);
             onCreate(sqliteDatabase, connectionSource);
 
         } catch (SQLException e) {
@@ -100,9 +98,9 @@ public class DRDbHelper extends OrmLiteSqliteOpenHelper{
     /* Create the getDao methods of all database tables to access those from android code.
     / Insert, delete, read, update everything will be happened through DAOs
 
-    public Dao<DRDbReceiptDetails, Integer> getReceiptDao() throws SQLException {
+    public Dao<DRReceiptDb, Integer> getReceiptDao() throws SQLException {
         if (receiptDao == null) {
-            receiptDao = getDao(DRDbReceiptDetails.class);
+            receiptDao = getDao(DRReceiptDb.class);
         }
         return receiptDao;
     }*/
