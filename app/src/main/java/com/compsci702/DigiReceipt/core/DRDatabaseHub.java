@@ -109,4 +109,35 @@ public class DRDatabaseHub {
             }
         });
     }
+
+    @NonNull Single<Cursor> getReceiptsForSearchQuery(final String searchString) {
+        return Single.fromCallable(new Callable<Cursor>() {
+            @Override public Cursor call() throws Exception {
+                final DRDbHelper dbHelper = DRApplication.getDbHelper();
+
+                // Removing all repeated spaces and spaces at end of string
+                String cleanSearchString = searchString.trim().replaceAll("[ ]{2,}", " ");
+
+                // Constructing where query string that finds any Items that have every search term somewhere in
+                // their searchtext
+                //noinspection StringBufferReplaceableByString
+                StringBuilder whereStringBuilder = new StringBuilder();
+                whereStringBuilder.append(DRReceiptDb.COLUMN_TAGS);
+                whereStringBuilder.append(" LIKE '%");
+                // Compares each word separately
+                whereStringBuilder.append(cleanSearchString.replace(" ", "%' AND " + DRReceiptDb.COLUMN_TAGS + " LIKE" +
+                        " '%"));
+                // Ensure query is case insensitive
+                whereStringBuilder.append("%' COLLATE NOCASE");
+
+                return dbHelper.getReadableDatabase().query(DRDbHelper.TABLE_RECEIPT,
+                        new String[]{DRReceiptDb.COLUMN_ID, DRReceiptDb.COLUMN_IMAGE_PATH, DRReceiptDb.COLUMN_TAGS},
+                        whereStringBuilder.toString(),
+                        null,
+                        null,
+                        null,
+                        null);
+            }
+        });
+    }
 }
