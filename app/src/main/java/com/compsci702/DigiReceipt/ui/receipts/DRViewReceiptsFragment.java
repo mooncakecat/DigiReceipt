@@ -75,7 +75,11 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 				@Override public String getFilename() {
 					return filePath;
 				}
-			};
+
+                @Override public String getTags() {
+                    return null;
+                }
+            };
 			mReceipts.add(receipt);
 		}
 

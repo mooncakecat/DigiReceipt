@@ -9,4 +9,6 @@ public interface DRReceipt {
     @NonNull int getId();
 
     @NonNull String getFilename();
+
+    String getTags();
 }
