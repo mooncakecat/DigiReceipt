@@ -13,8 +13,10 @@ import android.widget.Toast;
 import com.compsci702.DigiReceipt.database.DRDbHelper;
 import com.compsci702.DigiReceipt.database.DRReceiptDb;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -27,6 +29,7 @@ public class DRDatabaseHub {
      * member variables
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
     @NonNull private final DRDbHelper mDbHelper;
+    private Dao<DRReceiptDb, Integer> receiptDao;
 
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -53,9 +56,7 @@ public class DRDatabaseHub {
         return Observable.create(new Observable.OnSubscribe<DRReceiptDb>() {
             @Override public void call(Subscriber<? super DRReceiptDb> subscriber) {
                 try {
-
                     final DRReceiptDb dbReceipt;
-
                     // create a database version of the location
                     dbReceipt = new DRReceiptDb(receipt);
 
@@ -84,38 +85,22 @@ public class DRDatabaseHub {
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
     /**
-     * Get an observable that returns the receipt details.
+     * Returns all the entries in the DB as a list
      *
-     * @return Return an observable that returns emits the receipt details. The observable will emit a single
      * list (the receipt details) then complete.
+     * @return Return a list of receipts.
      */
-    @NonNull public Observable<? extends List<? extends DRReceiptDb>> getReceiptDetails() {
-        final Dao<DRReceiptDb, ?> dao = mDbHelper.getTable(DRReceiptDb.class);
-        Log.i("DRDatabaseHub","In getReceiptDetails() DRDatabaseHub");
-        return Observable.create(new Observable.OnSubscribe<List<? extends DRReceiptDb>>() {
-            @Override public void call(Subscriber<? super List<? extends DRReceiptDb>> subscriber) {
-                try {
-
-                    // query all receipt details
-                    List<DRReceiptDb> receipts = dao.queryForAll();
-                    for (DRReceiptDb receipt : receipts){
-                        Log.i("DRDatabaseHub",receipt.getFilename());
-                    }
-                    // pass to subscriber
-                    if (subscriber.isUnsubscribed()) return;
-                    subscriber.onNext(receipts);
-                    subscriber.onCompleted();
-
-                } catch (Throwable e) {
-                    // pass to subscriber
-                    if (subscriber.isUnsubscribed()) return;
-                    subscriber.onError(e);
-                }
-            }
-        });
+    public List<DRReceiptDb> getReceipts() throws SQLException {
+        try{receiptDao = mDbHelper.getReceiptDao(); }
+        catch(SQLException e){e.printStackTrace();}
+        return receiptDao.queryForAll();
     }
 
-    @NonNull Single<Cursor> getReceiptsForSearchQuery(final String searchString) {
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     * search receipts
+     * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    @NonNull public Single<Cursor> getReceiptsForSearchQuery(final String searchString) {
         return Single.fromCallable(new Callable<Cursor>() {
             @Override public Cursor call() throws Exception {
                 final DRDbHelper dbHelper = DRApplication.getDbHelper();

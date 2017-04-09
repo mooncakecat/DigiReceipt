@@ -27,6 +27,7 @@ public class DRDbHelper extends OrmLiteSqliteOpenHelper{
     private static final int DATABASE_VERSION = 1;
 
     private Map<Class<?>, Dao<?, ?>> mTableMap = new HashMap<>();
+    private Dao<DRReceiptDb, Integer> receiptDao;
 
     public static final String TABLE_RECEIPT = "TABLE_RECEIPT";
 
@@ -95,13 +96,13 @@ public class DRDbHelper extends OrmLiteSqliteOpenHelper{
         }
     }
 
-    /* Create the getDao methods of all database tables to access those from android code.
-    / Insert, delete, read, update everything will be happened through DAOs
+    // Create the getDao methods of all database tables to access those from android code.
+    // Insert, delete, read, update everything will be happened through DAOs
 
     public Dao<DRReceiptDb, Integer> getReceiptDao() throws SQLException {
         if (receiptDao == null) {
             receiptDao = getDao(DRReceiptDb.class);
         }
         return receiptDao;
-    }*/
+    }
 }

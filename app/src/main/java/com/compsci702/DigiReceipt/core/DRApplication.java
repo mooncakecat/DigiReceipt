@@ -29,16 +29,6 @@ public class  DRApplication extends Application {
 	 * context
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-  /**
-   * Return the application context
-   *
-   * @return returns the application context
-   */
-  @NonNull
-  public static Context setContext(Context context) {
-    sContext = context;
-    return sContext;
-  }
 
   /**
    * Return the application context
@@ -46,9 +36,7 @@ public class  DRApplication extends Application {
    * @return returns the application context
    */
   @NonNull
-  public static Context getContext() {
-    return sContext;
-  }
+  public static Context getContext() {return sInstance.getApplicationContext();}
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	 * application hub
