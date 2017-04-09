@@ -7,9 +7,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,8 +19,11 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.compsci702.DigiReceipt.R;
+import com.compsci702.DigiReceipt.core.DRApplication;
+import com.compsci702.DigiReceipt.core.DRApplicationHub;
 import com.compsci702.DigiReceipt.ui.base.DRBaseFragment;
 import com.compsci702.DigiReceipt.ui.main.DRMainFragment;
+import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 import com.compsci702.DigiReceipt.ui.receipts.DRAddReceiptFragment;
 import com.compsci702.DigiReceipt.ui.receipts.DRViewReceiptsFragment;
 import com.compsci702.DigiReceipt.util.DRFileUtil;
@@ -132,6 +137,27 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 		if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 			Toast.makeText(this, R.string.image_saved, Toast.LENGTH_SHORT).show();
 		}
+		DRReceipt receipt = new DRReceipt() {
+			@NonNull
+			@Override
+			public int getId() {
+				return 0;
+			}
+
+			@NonNull
+			@Override
+			public String getFilename() {
+				return null;
+			}
+
+			@Override
+			public String getTags() {
+				return null;
+			}
+		};
+		Log.i("DRMainActivity","HERE1!!");
+		DRApplication.getApplicationHub().addReceipt(receipt);
+		Log.i("DRMainActivity","HERE2!!");
 	}
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
