@@ -3,6 +3,7 @@ package com.compsci702.DigiReceipt.core;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.compsci702.DigiReceipt.database.DRDbHelper;
 
@@ -11,7 +12,8 @@ import com.compsci702.DigiReceipt.database.DRDbHelper;
  */
 public class  DRApplication extends Application {
 
-  private static DRApplication sInstance;
+  public static DRApplication sInstance;
+  public static Context sContext;
   private static DRApplicationHub sApplicationHub;
   private static DRDatabaseHub sDatabaseHub;
   private static DRNetworkHub sNetworkHub;
@@ -21,9 +23,7 @@ public class  DRApplication extends Application {
    * constructor
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-  public DRApplication() {
-    sInstance = this;
-  }
+  public DRApplication() {sInstance = this;}
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	 * context
@@ -35,13 +35,25 @@ public class  DRApplication extends Application {
    * @return returns the application context
    */
   @NonNull
+  public static Context setContext(Context context) {
+    sContext = context;
+    return sContext;
+  }
+
+  /**
+   * Return the application context
+   *
+   * @return returns the application context
+   */
+  @NonNull
   public static Context getContext() {
-    return sInstance.getApplicationContext();
+    return sContext;
   }
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	 * application hub
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 
   /**
    * Get the application hub.

@@ -7,6 +7,8 @@ import rx.Subscriber;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.support.annotation.NonNull;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.compsci702.DigiReceipt.database.DRDbHelper;
 import com.compsci702.DigiReceipt.database.DRReceiptDb;
@@ -89,13 +91,16 @@ public class DRDatabaseHub {
      */
     @NonNull public Observable<? extends List<? extends DRReceiptDb>> getReceiptDetails() {
         final Dao<DRReceiptDb, ?> dao = mDbHelper.getTable(DRReceiptDb.class);
+        Log.i("DRDatabaseHub","In getReceiptDetails() DRDatabaseHub");
         return Observable.create(new Observable.OnSubscribe<List<? extends DRReceiptDb>>() {
             @Override public void call(Subscriber<? super List<? extends DRReceiptDb>> subscriber) {
                 try {
 
-                    // query all receipt details (CHANGE TO QUERY FOR ONES WITH MATCHING TAG??)
+                    // query all receipt details
                     List<DRReceiptDb> receipts = dao.queryForAll();
-
+                    for (DRReceiptDb receipt : receipts){
+                        Log.i("DRDatabaseHub",receipt.getFilename());
+                    }
                     // pass to subscriber
                     if (subscriber.isUnsubscribed()) return;
                     subscriber.onNext(receipts);
