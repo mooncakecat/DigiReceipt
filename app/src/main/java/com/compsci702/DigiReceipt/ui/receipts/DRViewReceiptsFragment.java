@@ -5,6 +5,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,6 +64,7 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 		String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/DigiReceipt";
 		File directory = new File(path);
 		final File[] files = directory.listFiles();
+		Log.i("GetFiles", path);
 
 		// reverse order to show latest receipts at the top
 		for (int i = files.length - 1; i > -1; i--) {

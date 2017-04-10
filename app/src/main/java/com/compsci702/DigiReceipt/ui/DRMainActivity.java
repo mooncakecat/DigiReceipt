@@ -10,9 +10,11 @@ import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -21,6 +23,7 @@ import com.compsci702.DigiReceipt.core.DRNetworkHub;
 import com.compsci702.DigiReceipt.ui.base.DRBaseFragment;
 import com.compsci702.DigiReceipt.ui.main.DRMainFragment;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
+import com.compsci702.DigiReceipt.ui.model.DRReceiptTemp;
 import com.compsci702.DigiReceipt.ui.receipts.DRViewReceiptsFragment;
 import com.compsci702.DigiReceipt.util.DRFileUtil;
 
@@ -140,8 +143,6 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 			Toast.makeText(this, R.string.image_saved, Toast.LENGTH_SHORT).show();
             try {
                 getTextFromObservable(uri.toString());
-				//System.out.println(uri.toString());
-               // DRReceipt receipt = DRNetworkHub.sendPost(uri.toString());
                // Toast.makeText(this, receipt.getText(), Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -152,7 +153,7 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
     private void getTextFromObservable(String uriForFilePath){
         DRNetworkHub.httpObservable(uriForFilePath.toString()).
                 subscribeOn(Schedulers.newThread()).
-                observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<DRReceipt>() {
+                observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<DRReceiptTemp>() {
             @Override
             public void onCompleted() {
 
@@ -164,9 +165,9 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
             }
 
             @Override
-            public void onNext(DRReceipt receipt) {
-                //Toast.makeText(this, receipt.getText(), Toast.LENGTH_SHORT).show();
-				//Here you will receive the instance of DRReceipt, I'm not sure what to do next.
+            public void onNext(DRReceiptTemp receipt) {
+                //Button button = (Button) findViewById(R.id.add_receipt_button);
+                //button.setText(receipt.getText());
             }
         });
 
