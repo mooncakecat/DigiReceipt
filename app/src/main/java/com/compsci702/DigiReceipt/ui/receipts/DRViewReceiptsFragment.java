@@ -67,22 +67,24 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 		Log.i("GetFiles", path);
 
 		// reverse order to show latest receipts at the top
-		for (int i = files.length - 1; i > -1; i--) {
-			final String filePath = files[i].getAbsolutePath();
-			DRReceipt receipt = new DRReceipt() {
-				@Override public int getId() {
-					return 0;
-				}
+		if (files != null) {
+			for (int i = files.length - 1; i > -1; i--) {
+				final String filePath = files[i].getAbsolutePath();
+				DRReceipt receipt = new DRReceipt() {
+					@Override public int getId() {
+						return 0;
+					}
 
-				@Override public String getFilename() {
-					return filePath;
-				}
+					@Override public String getFilename() {
+						return filePath;
+					}
 
-                @Override public String getText() {
-                    return null;
-                }
-            };
-			mReceipts.add(receipt);
+					@Override public String getText() {
+						return null;
+					}
+				};
+				mReceipts.add(receipt);
+			}
 		}
 
 		mAdapter = new DRReceiptsRecyclerViewAdapter(getActivity(), mReceipts, this);
