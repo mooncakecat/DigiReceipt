@@ -136,7 +136,7 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 		// Ensure that there's a camera activity to handle the intent
 		if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 			// This causes crashes on api 24 and above: Uri pictureURI = Uri.fromFile(generateMediaFile());
-			uri = FileProvider.getUriForFile(DRMainActivity.this, BuildConfig.APPLICATION_ID + ".provider",
+			uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".fileprovider",
 					generateMediaFile());
 			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
 			startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
