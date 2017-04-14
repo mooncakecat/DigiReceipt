@@ -3,10 +3,12 @@ package com.compsci702.DigiReceipt.ui;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.SQLException;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,13 +21,19 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.compsci702.DigiReceipt.R;
+import com.compsci702.DigiReceipt.core.DRApplication;
+import com.compsci702.DigiReceipt.core.DRApplicationHub;
 import com.compsci702.DigiReceipt.core.DRNetworkHub;
+import com.compsci702.DigiReceipt.database.DRReceiptDb;
 import com.compsci702.DigiReceipt.ui.base.DRBaseFragment;
 import com.compsci702.DigiReceipt.ui.main.DRMainFragment;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 import com.compsci702.DigiReceipt.ui.model.DRReceiptTemp;
 import com.compsci702.DigiReceipt.ui.receipts.DRViewReceiptsFragment;
 import com.compsci702.DigiReceipt.util.DRFileUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,6 +51,9 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 	static final int REQUEST_IMAGE_CAPTURE = 1;
 	static final int REQUEST_CODE = 5;
     public static Uri uri = null;
+
+	DRApplicationHub mApplicationHub = DRApplication.getApplicationHub();
+	private List<DRReceiptDb> mReceipts = new ArrayList<>();
 
 	@BindView(R.id.fragment_container) FrameLayout mFragmentContainer;
 	@BindView(R.id.toolbar) Toolbar mToolbar;
@@ -78,6 +89,8 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 		switch (item.getItemId()) {
 			case R.id.search_icon:
 				DRSearchActivity.startActivity(this);
+				//test for DB
+				searchReceipts();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -106,6 +119,9 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
 	@Override public void onReceiptSelected(String receiptFilename) {
 		DRImageActivity.startActivity(this, receiptFilename);
+		//Test for DB
+		try{getReceipts();}
+		catch(SQLException e){e.printStackTrace();}
 	}
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -141,7 +157,9 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 	@Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 			Toast.makeText(this, R.string.image_saved, Toast.LENGTH_SHORT).show();
-            try {
+			//Test for DB
+			addReceipt();
+			try {
                 getTextFromObservable(uri.toString());
                // Toast.makeText(this, receipt.getText(), Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
@@ -172,6 +190,63 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
         });
 
     }
+
+     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   * test for DB
+   * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+	private void addReceipt(){
+		Log.i("DRMainActivity","----Add receipt in MainActivity----");
+		//Dummy Data
+		DRReceipt receipt = new DRReceipt() {
+			@NonNull
+			@Override
+			public int getId(){return 0;}
+
+			@NonNull
+			@Override
+			public String getFilename() {
+				return "C://DigiReceipt4";
+			}
+
+			@Override
+			public String getText() {
+				return "Banana Orange Apple";
+			}
+		};
+		mApplicationHub.addReceipt(receipt);
+		Log.i("DRMainActivity", "----Added receipt in MainActivity---- ID: "+ receipt.getId());
+		Log.i("DRMainActivity", "----Added receipt in MainActivity---- File path: "+ receipt.getFilename());
+		Log.i("DRMainActivity", "----Added receipt in MainActivity---- Tags: "+ receipt.getText());
+	}
+
+	private void getReceipts() throws SQLException {
+		Log.i("DRMainActivity","----Get receipt in MainActivity----");
+		try{
+			mReceipts = mApplicationHub.getReceipt();
+			for (DRReceiptDb receipt : mReceipts){
+				Log.i("DRMainActivity", "----Get receipt in MainActivity---- ID: "+ receipt.getId());
+				Log.i("DRMainActivity", "----Get receipt in MainActivity---- File path: "+ receipt.getFilename());
+				Log.i("DRMainActivity", "----Get receipt in MainActivity---- Tags: "+ receipt.getText());
+			}
+			Log.i("DRMainActivity", "----Get receipt in MainActivity---- Size: "+ mReceipts.size());
+		}
+		catch (java.sql.SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void searchReceipts() {
+		//getReceiptsForSearchQuery works but I'm not sure how to call it with Single
+
+		/*Log.i("DRMainActivity","----Search receipt in MainActivity----");
+		Cursor a = mApplicationHub.searchReceipt("Apple");
+		Log.i("DRMainActivity","----Search receipt in MainActivity---- Result size: " + a.getCount());*/
+
+	}
+	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   * end of test for DB
+   * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * general methods
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
