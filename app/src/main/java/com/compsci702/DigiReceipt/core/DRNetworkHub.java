@@ -26,7 +26,7 @@ public class DRNetworkHub {
     static Gson gson = new Gson();
 
     private static byte[] readBytesFromFile(String filePath) {
-        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/DigiReceipt/";
+        String path = String.valueOf(DRApplication.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)) + "/";
         path += filePath.split("/")[filePath.split("/").length-1];
         FileInputStream fileInputStream = null;
         byte[] bytesArray = null;

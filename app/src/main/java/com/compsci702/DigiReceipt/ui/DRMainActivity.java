@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.compsci702.DigiReceipt.BuildConfig;
 import com.compsci702.DigiReceipt.R;
 import com.compsci702.DigiReceipt.core.DRApplication;
 import com.compsci702.DigiReceipt.core.DRApplicationHub;
@@ -40,6 +42,8 @@ import butterknife.ButterKnife;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+
+import static com.compsci702.DigiReceipt.util.DRFileUtil.generateMediaFile;
 
 public class DRMainActivity extends AppCompatActivity implements DRMainFragment.FragmentListener,
         DRViewReceiptsFragment.FragmentListener {
@@ -147,9 +151,10 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
 		// Ensure that there's a camera activity to handle the intent
 		if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-			Uri pictureURI = Uri.fromFile(DRFileUtil.generateMediaFile());
-            uri = pictureURI;
-			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, pictureURI);
+			// This causes crashes on api 24 and above: Uri pictureURI = Uri.fromFile(generateMediaFile());
+			uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".fileprovider",
+					generateMediaFile());
+			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
 			startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 		}
 	}
