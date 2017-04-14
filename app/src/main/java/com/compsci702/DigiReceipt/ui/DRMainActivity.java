@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.SQLException;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,14 +35,22 @@ import com.compsci702.DigiReceipt.ui.model.DRReceiptTemp;
 import com.compsci702.DigiReceipt.ui.receipts.DRViewReceiptsFragment;
 import com.compsci702.DigiReceipt.util.DRFileUtil;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.Observable;
+import rx.Observer;
+import rx.Single;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.SingleSubscriber;
 
 import static com.compsci702.DigiReceipt.util.DRFileUtil.generateMediaFile;
 
@@ -227,6 +236,7 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
 	private void getReceipts() throws SQLException {
 		Log.i("DRMainActivity","----Get receipt in MainActivity----");
+
 		try{
 			mReceipts = mApplicationHub.getReceipt();
 			for (DRReceiptDb receipt : mReceipts){
@@ -242,12 +252,25 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 	}
 
 	private void searchReceipts() {
-		//getReceiptsForSearchQuery works but I'm not sure how to call it with Single
 
-		/*Log.i("DRMainActivity","----Search receipt in MainActivity----");
-		Cursor a = mApplicationHub.searchReceipt("Apple");
-		Log.i("DRMainActivity","----Search receipt in MainActivity---- Result size: " + a.getCount());*/
+		Log.i("DRMainActivity","----Search receipt in MainActivity----");
+		Single<Cursor> a = mApplicationHub.searchReceipt("Apple");
 
+		Subscription aSubscription = a
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(new SingleSubscriber<Cursor>() {
+
+					@Override
+					public void onSuccess(Cursor a) {
+						Log.i("DRMainActivity","----Single---- Result size: " + a.getCount());
+					}
+
+					@Override
+					public void onError(Throwable error) {
+
+					}
+				});
 	}
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * end of test for DB
