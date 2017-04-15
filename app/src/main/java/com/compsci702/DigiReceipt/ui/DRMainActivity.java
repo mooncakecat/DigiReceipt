@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -16,7 +17,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -37,6 +37,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -89,8 +91,6 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 		switch (item.getItemId()) {
 			case R.id.search_icon:
 				DRSearchActivity.startActivity(this);
-				//test for DB
-				searchReceipts();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -120,8 +120,11 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 	@Override public void onReceiptSelected(String receiptFilename) {
 		DRImageActivity.startActivity(this, receiptFilename);
 		//Test for DB
-		try{getReceipts();}
-		catch(SQLException e){e.printStackTrace();}
+		try {
+			getReceipts();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -157,11 +160,9 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 	@Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 			Toast.makeText(this, R.string.image_saved, Toast.LENGTH_SHORT).show();
-			//Test for DB
-			addReceipt();
 			try {
                 getTextFromObservable(uri.toString());
-               // Toast.makeText(this, receipt.getText(), Toast.LENGTH_SHORT).show();
+				addReceipt();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -185,68 +186,75 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
             @Override
             public void onNext(DRReceiptTemp receipt) {
                 //Button button = (Button) findViewById(R.id.add_receipt_button);
-                //button.setText(receipt.getText());
+                //button.setText(receipt.getTags());
             }
         });
 
     }
 
-     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   * test for DB
-   * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     * test for DB
+   	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	private void addReceipt(){
 		Log.i("DRMainActivity","----Add receipt in MainActivity----");
 		//Dummy Data
 		DRReceipt receipt = new DRReceipt() {
-			@NonNull
-			@Override
-			public int getId(){return 0;}
+			@NonNull @Override public int getId() {
+				return 0;
+			}
 
-			@NonNull
-			@Override
-			public String getFilename() {
+			@NonNull @Override public String getFilename() {
 				return "C://DigiReceipt4";
 			}
 
-			@Override
-			public String getText() {
-				return "Banana Orange Apple";
+			@Override public String getTags() {
+				return "BananaOrange apple";
 			}
 		};
 		mApplicationHub.addReceipt(receipt);
 		Log.i("DRMainActivity", "----Added receipt in MainActivity---- ID: "+ receipt.getId());
 		Log.i("DRMainActivity", "----Added receipt in MainActivity---- File path: "+ receipt.getFilename());
-		Log.i("DRMainActivity", "----Added receipt in MainActivity---- Tags: "+ receipt.getText());
+		Log.i("DRMainActivity", "----Added receipt in MainActivity---- Tags: "+ receipt.getTags());
 	}
 
 	private void getReceipts() throws SQLException {
 		Log.i("DRMainActivity","----Get receipt in MainActivity----");
 		try{
-			mReceipts = mApplicationHub.getReceipt();
-			for (DRReceiptDb receipt : mReceipts){
+			List<DRReceiptDb> receipts = mApplicationHub.getReceipt();
+			for (DRReceiptDb receipt : receipts){
 				Log.i("DRMainActivity", "----Get receipt in MainActivity---- ID: "+ receipt.getId());
 				Log.i("DRMainActivity", "----Get receipt in MainActivity---- File path: "+ receipt.getFilename());
-				Log.i("DRMainActivity", "----Get receipt in MainActivity---- Tags: "+ receipt.getText());
+				Log.i("DRMainActivity", "----Get receipt in MainActivity---- Tags: "+ receipt.getTags());
 			}
-			Log.i("DRMainActivity", "----Get receipt in MainActivity---- Size: "+ mReceipts.size());
+			Log.i("DRMainActivity", "----Get receipt in MainActivity---- Size: "+ receipts.size());
+
+			final List<DRReceipt> searchReceiptResults = new ArrayList<>();
+			Observable<List <? extends DRReceipt>> searchObservable = mApplicationHub.searchReceipt("Apple")
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread());
+
+			searchObservable.subscribe(new Subscriber<List<? extends DRReceipt>>() {
+				@Override public void onCompleted() {
+					Log.i("do","dop");
+				}
+
+				@Override public void onError(Throwable e) {
+					Log.i("MainActivity", "error: ", e);
+				}
+
+				@Override public void onNext(List<? extends DRReceipt> receipts) {
+					searchReceiptResults.clear();
+					searchReceiptResults.addAll(receipts);
+				}
+			});
+
 		}
 		catch (java.sql.SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void searchReceipts() {
-		//getReceiptsForSearchQuery works but I'm not sure how to call it with Single
-
-		/*Log.i("DRMainActivity","----Search receipt in MainActivity----");
-		Cursor a = mApplicationHub.searchReceipt("Apple");
-		Log.i("DRMainActivity","----Search receipt in MainActivity---- Result size: " + a.getCount());*/
-
-	}
-	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   * end of test for DB
-   * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * general methods
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
