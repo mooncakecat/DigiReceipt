@@ -10,5 +10,5 @@ public interface DRReceipt {
 
     String getFilename();
 
-    String getText();
+    String getTags();
 }
