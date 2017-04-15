@@ -37,6 +37,7 @@ dependencies {
     // rx android
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.6'
+    compile 'com.jakewharton.rxbinding:rxbinding-appcompat-v7:1.0.0'
     // ormlite
     compile 'com.j256.ormlite:ormlite-android:4.48'
     // glide

@@ -4,4 +4,19 @@
   android:layout_height="match_parent"
   tools:context="com.compsci702.DigiReceipt.ui.search.DRSearchFragment">
 
+    <android.support.v7.widget.RecyclerView
+    android:id="@+id/items_recyclerview"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:listitem="@layout/row_receipt_thumbnail" />
+
+    <TextView
+        android:id="@+id/no_results_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        tools:text="@string/no_results"
+        tools:visibility="visible" />
+
 </FrameLayout>

@@ -10,6 +10,7 @@
 
   <!-- Search -->
   <string name="search">search</string>
+  <string name="no_results">No results were found</string>
 
   <!-- Take pictures -->
   <string name="permissions_error">Permissions Error</string>
