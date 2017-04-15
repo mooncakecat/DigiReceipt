@@ -89,7 +89,7 @@ public class DRImageFragment extends DRBaseFragment<DRImageFragment.FragmentList
 					return filePath;
 				}
 
-				@Override public String getText() {
+				@Override public String getTags() {
 					return null;
 				}
 			};

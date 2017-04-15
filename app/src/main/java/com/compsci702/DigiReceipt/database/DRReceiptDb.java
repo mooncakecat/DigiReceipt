@@ -31,7 +31,7 @@ public class DRReceiptDb implements DRReceipt {
     public DRReceiptDb(@NonNull DRReceipt receipt) {
         mId = receipt.getId();
         mFilename = receipt.getFilename();
-        mTags = receipt.getText();
+        mTags = receipt.getTags();
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -47,7 +47,7 @@ public class DRReceiptDb implements DRReceipt {
     }
 
     // currently there is nothing stopping the tags from being empty, i.e. take a photo that has no receipt in it
-    public String getText() {
+    public String getTags() {
         return mTags;
     }
 }

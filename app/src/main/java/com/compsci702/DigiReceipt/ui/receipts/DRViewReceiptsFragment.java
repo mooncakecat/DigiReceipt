@@ -79,7 +79,7 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 						return filePath;
 					}
 
-					@Override public String getText() {
+					@Override public String getTags() {
 						return null;
 					}
 				};
