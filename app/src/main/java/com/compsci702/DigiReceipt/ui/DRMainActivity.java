@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -32,7 +31,6 @@ import com.compsci702.DigiReceipt.ui.main.DRMainFragment;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 import com.compsci702.DigiReceipt.ui.model.DRReceiptTemp;
 import com.compsci702.DigiReceipt.ui.receipts.DRViewReceiptsFragment;
-import com.compsci702.DigiReceipt.util.DRFileUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +38,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
-import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -167,7 +164,7 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 			Toast.makeText(this, R.string.image_saved, Toast.LENGTH_SHORT).show();
 			try {
                 getTextFromObservable(uri.toString());
-				addReceipt();
+				//addReceipt();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -190,8 +187,7 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
             @Override
             public void onNext(DRReceiptTemp receipt) {
-                //Button button = (Button) findViewById(R.id.add_receipt_button);
-                //button.setText(receipt.getTags());
+				addReceipt(receipt);
             }
         });
 
@@ -201,12 +197,18 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
      * test for DB
    	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	private void addReceipt(){
+	private void addReceipt(final DRReceiptTemp receiptTemp){
 		Log.i("DRMainActivity","----Add receipt in MainActivity----");
 		//Dummy Data
 		DRReceipt receipt = new DRReceipt() {
+
 			@NonNull @Override public int getId() {
 				return 0;
+			}
+
+			@Override
+			public String getText() {
+				return receiptTemp.getText();
 			}
 
 			@NonNull @Override public String getFilename() {
@@ -217,6 +219,7 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 				return "BananaOrange apple";
 			}
 		};
+
 		mApplicationHub.addReceipt(receipt);
 		Log.i("DRMainActivity", "----Added receipt in MainActivity---- ID: "+ receipt.getId());
 		Log.i("DRMainActivity", "----Added receipt in MainActivity---- File path: "+ receipt.getFilename());
