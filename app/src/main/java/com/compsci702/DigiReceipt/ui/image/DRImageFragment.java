@@ -73,7 +73,7 @@ public class DRImageFragment extends DRBaseFragment<DRImageFragment.FragmentList
 		}
 
 		// FIXME: 4/2/2017 Should be done on a new thread
-		String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/DigiReceipt";
+		String path = String.valueOf(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES));
 		File directory = new File(path);
 		final File[] files = directory.listFiles();
 
