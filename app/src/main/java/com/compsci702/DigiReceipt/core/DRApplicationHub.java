@@ -1,6 +1,5 @@
 package com.compsci702.DigiReceipt.core;
 
-import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -9,9 +8,9 @@ import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 
 import java.sql.SQLException;
 import java.util.List;
+
 import rx.Observable;
 import rx.Observer;
-import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -19,7 +18,9 @@ import rx.schedulers.Schedulers;
  * Application hub.
  */
 public class DRApplicationHub {
+
 	private static final String TAG = "DRApplicationHub";
+
 	private final DRDatabaseHub mDatabaseHub = DRApplication.getDatabaseHub();
 	private final DRNetworkHub mNetworkHub = DRApplication.getNetworkHub();
 
@@ -33,9 +34,13 @@ public class DRApplicationHub {
 	 * @return Return an observable that emits the receipt details.
 	 * The observable will emit a static list of data, then complete.
 	 */
+	// FIXME: 4/15/2017 Currently only used for testing, not required in final usage
 	@NonNull public List<DRReceiptDb> getReceipt() throws SQLException {
-		try{return mDatabaseHub.getReceipts(); }
-		catch (SQLException e){Log.e(TAG, "error in getReceipt", e);}
+		try {
+			return mDatabaseHub.getReceipts();
+		} catch (SQLException e) {
+			Log.e(TAG, "error in getReceipt", e);
+		}
 		return null;
 	}
 
@@ -58,12 +63,12 @@ public class DRApplicationHub {
 					}
 
 					@Override public void onError(Throwable e) {
-						Log.e(TAG, "error in addReceipt", e);
+						Log.e(TAG, "Error in addReceipt: ", e);
 					}
 				});
 	}
 
-	public Single<Cursor> searchReceipt(@NonNull String word) {
-		return mDatabaseHub.getReceiptsForSearchQuery(word);
+	public Observable<List<? extends DRReceipt>> searchReceipt(@NonNull String query) {
+		return mDatabaseHub.searchReceipts(query).toObservable();
 	}
 }

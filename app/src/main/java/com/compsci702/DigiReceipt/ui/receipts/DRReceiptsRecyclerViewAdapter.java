@@ -23,18 +23,18 @@ import butterknife.ButterKnife;
 /**
  * A {@link android.support.v7.widget.RecyclerView.Adapter} for displaying receipts
  */
-class DRReceiptsRecyclerViewAdapter extends RecyclerView.Adapter<DRReceiptsRecyclerViewAdapter.ViewHolder> {
+public class DRReceiptsRecyclerViewAdapter extends RecyclerView.Adapter<DRReceiptsRecyclerViewAdapter.ViewHolder> {
 
     @NonNull private final List<DRReceipt> mReceiptsList;
     @NonNull private final Context mContext;
     @NonNull private final AdapterListener mAdapterListener;
 
-    interface AdapterListener {
+    public interface AdapterListener {
         void onReceiptSelected(String receiptFilename);
     }
 
-    DRReceiptsRecyclerViewAdapter(@NonNull Context context, @NonNull List<DRReceipt> receiptsList,
-                                  @NonNull AdapterListener adapterListener) {
+    public DRReceiptsRecyclerViewAdapter(@NonNull Context context, @NonNull List<DRReceipt> receiptsList,
+										 @NonNull AdapterListener adapterListener) {
         mContext = context;
         mReceiptsList = receiptsList;
         mAdapterListener = adapterListener;

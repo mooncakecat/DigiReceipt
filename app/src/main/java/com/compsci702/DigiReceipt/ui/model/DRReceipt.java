@@ -6,9 +6,9 @@ package com.compsci702.DigiReceipt.ui.model;
 public interface DRReceipt {
     int getId();
 
-    String text = "";
+    String getText();
 
     String getFilename();
 
-    String getText();
+    String getTags();
 }
