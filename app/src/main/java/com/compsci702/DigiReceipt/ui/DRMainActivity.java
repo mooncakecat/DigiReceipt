@@ -254,16 +254,25 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 	private void searchReceipts() {
 
 		Log.i("DRMainActivity","----Search receipt in MainActivity----");
-		Single<Cursor> a = mApplicationHub.searchReceipt("Apple");
+		Single<Cursor> MatchingReceiptsCursorInSingle = mApplicationHub.searchReceipt("Apple");
 
-		Subscription aSubscription = a
+		Subscription aSubscription = MatchingReceiptsCursorInSingle
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(new SingleSubscriber<Cursor>() {
 
 					@Override
-					public void onSuccess(Cursor a) {
-						Log.i("DRMainActivity","----Single---- Result size: " + a.getCount());
+					public void onSuccess(Cursor MatchingReceiptsCursor) {
+						Log.i("DRMainActivity","----Single---- Result size: " + MatchingReceiptsCursor.getCount());
+						try{
+							while(MatchingReceiptsCursor.moveToNext()){
+								int id = MatchingReceiptsCursor.getInt(0);
+								Log.i("DRMainActivity","----Single---- id: " + id);
+							}
+						}
+						finally {
+							MatchingReceiptsCursor.close();
+						}
 					}
 
 					@Override
