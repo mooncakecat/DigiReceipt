@@ -66,10 +66,10 @@ public class DRDatabaseHub {
                     }
 
                     //testing parameters
-                    Log.i("Check inserted receipt","-----------------------------");
-                    Log.i("id","" + dbReceipt.getId());
-                    Log.i("filename","" + dbReceipt.getFilename());
-                    Log.i("tag","" + dbReceipt.getTags());
+                    Log.i("DRDatabaseHub","---------------Check inserted receipt--------------");
+                    Log.i("DRDatabaseHub","id: " + dbReceipt.getId());
+                    Log.i("DRDatabaseHub","filename: " + dbReceipt.getFilename());
+                    Log.i("DRDatabaseHub","tag: " + dbReceipt.getTags());
 
                     // pass to subscriber
                     if (subscriber.isUnsubscribed()) return;
