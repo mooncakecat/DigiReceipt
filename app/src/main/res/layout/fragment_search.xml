@@ -5,7 +5,7 @@
   tools:context="com.compsci702.DigiReceipt.ui.search.DRSearchFragment">
 
     <android.support.v7.widget.RecyclerView
-    android:id="@+id/items_recyclerview"
+    android:id="@+id/recyclerview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:listitem="@layout/row_receipt_thumbnail" />
