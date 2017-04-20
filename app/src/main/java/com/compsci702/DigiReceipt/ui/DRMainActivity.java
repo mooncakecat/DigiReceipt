@@ -215,15 +215,10 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 				return 0;
 			}
 
-			/*
-			@Override
-			public String getText() {
-				return receiptTemp.getText();
-			}
-			*/
-
 			@NonNull @Override public String getFilename() {
-				return "C://DigiReceipt4";
+
+				//return "C://DigiReceipt4";
+				return uri.toString();
 			}
 
 			@Override public String getTags() {
@@ -233,9 +228,6 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 		};
 
 		mApplicationHub.addReceipt(receipt);
-		Log.i("DRMainActivity", "----Added receipt in MainActivity---- ID: "+ receipt.getId());
-		Log.i("DRMainActivity", "----Added receipt in MainActivity---- File path: "+ receipt.getFilename());
-		Log.i("DRMainActivity", "----Added receipt in MainActivity---- Tags: "+ receipt.getTags());
 	}
 
 	private void getReceipts() throws SQLException {

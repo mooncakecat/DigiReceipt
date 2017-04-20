@@ -2,6 +2,7 @@ package com.compsci702.DigiReceipt.core;
 
 import android.database.sqlite.SQLiteException;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.compsci702.DigiReceipt.database.DRDbHelper;
 import com.compsci702.DigiReceipt.database.DRReceiptDb;
@@ -63,6 +64,12 @@ public class DRDatabaseHub {
                     if (status == -1) {
                         throw new SQLiteException("error inserting receipt: " + receipt);
                     }
+
+                    //testing parameters
+                    Log.i("Check inserted receipt","-----------------------------");
+                    Log.i("id","" + dbReceipt.getId());
+                    Log.i("filename","" + dbReceipt.getFilename());
+                    Log.i("tag","" + dbReceipt.getTags());
 
                     // pass to subscriber
                     if (subscriber.isUnsubscribed()) return;
