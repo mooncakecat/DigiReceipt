@@ -215,17 +215,20 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 				return 0;
 			}
 
+			/*
 			@Override
 			public String getText() {
 				return receiptTemp.getText();
 			}
+			*/
 
 			@NonNull @Override public String getFilename() {
 				return "C://DigiReceipt4";
 			}
 
 			@Override public String getTags() {
-				return "BananaOrange apple";
+				//return "BananaOrange apple";
+				return receiptTemp.getText();
 			}
 		};
 
