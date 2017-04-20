@@ -21,6 +21,7 @@ import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 import com.compsci702.DigiReceipt.ui.receipts.DRReceiptsRecyclerViewAdapter;
 import com.jakewharton.rxbinding.support.v7.widget.RxSearchView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -54,7 +55,7 @@ public class DRSearchFragment extends DRBaseFragment<DRSearchFragment.FragmentLi
 
 	private final DRApplicationHub mApplicationHub = DRApplication.getApplicationHub();
 	private Subscription mSearchFilterSubscription;
-	private List<DRReceipt> mReceipts;
+	private List<DRReceipt> mReceipts = new ArrayList<>();
 
 	private DRReceiptsRecyclerViewAdapter mAdapter;
 	private String mQuery;
