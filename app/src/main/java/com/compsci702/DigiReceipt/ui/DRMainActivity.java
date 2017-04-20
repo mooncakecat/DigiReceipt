@@ -207,7 +207,30 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
    	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	private void addReceipt(final DRReceiptTemp receiptTemp){
-		Log.i("DRMainActivity","----Add receipt in MainActivity----");
+		new Thread(new Runnable() {
+			public void run() {
+				Log.i("DRMainActivity","----Add receipt in MainActivity with new thread----");
+				//Dummy Data
+				DRReceipt receipt = new DRReceipt() {
+
+					@NonNull @Override public int getId() {
+						return 0;
+					}
+
+					@NonNull @Override public String getFilename() {
+
+						return uri.toString();
+					}
+
+					@Override public String getTags() {
+						return receiptTemp.getText();
+					}
+				};
+
+				mApplicationHub.addReceipt(receipt);
+			}
+		}).start();
+		/*Log.i("DRMainActivity","----Add receipt in MainActivity----");
 		//Dummy Data
 		DRReceipt receipt = new DRReceipt() {
 
@@ -217,17 +240,15 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
 			@NonNull @Override public String getFilename() {
 
-				//return "C://DigiReceipt4";
 				return uri.toString();
 			}
 
 			@Override public String getTags() {
-				//return "BananaOrange apple";
 				return receiptTemp.getText();
 			}
 		};
 
-		mApplicationHub.addReceipt(receipt);
+		mApplicationHub.addReceipt(receipt);*/
 	}
 
 	private void getReceipts() throws SQLException {
