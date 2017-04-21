@@ -1,6 +1,8 @@
 package com.compsci702.DigiReceipt.core;
 
 import android.os.Environment;
+import android.util.Log;
+
 import com.compsci702.DigiReceipt.ui.model.DRReceiptTemp;
 import com.google.api.client.util.Base64;
 import com.google.gson.Gson;
@@ -65,7 +67,7 @@ public class DRNetworkHub {
                         +"}], \"image\": {\"content\": \"" + Base64.encodeBase64String(fileContent)+ "\"}}]}");
         httpRequestBodyWriter.close();
         String response = httpConnection.getResponseMessage();
-        if (httpConnection.getInputStream() == null) {
+        if (httpConnection.getInputStream() == null && !response.equals("OK")) {
             return null;
         }
         Scanner httpResponseScanner = new Scanner (httpConnection.getInputStream());
@@ -76,8 +78,17 @@ public class DRNetworkHub {
                 temp = line;
             }
         }
+        String[] tempArray = temp.split(":");
+        if(tempArray.length > 1 && temp.contains("text")){
+            temp = "";
+            for(int i = 1; i < tempArray.length; i++ ){
+               temp += tempArray[i];
+            }
+            temp = temp.replaceAll("\"", "");
+            temp = temp.trim();
+        }
         httpResponseScanner.close();
-        return (DRReceiptTemp) gson.fromJson("{"+ temp + "}", Class.forName("com.compsci702.DigiReceipt.ui.model.DRReceiptTemp"));
+        return new DRReceiptTemp(temp);
     }
     public static rx.Observable<DRReceiptTemp> httpObservable(final String filePath){
         return Observable.create(new Observable.OnSubscribe<DRReceiptTemp>() {

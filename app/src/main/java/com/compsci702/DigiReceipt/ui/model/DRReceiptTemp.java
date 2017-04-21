@@ -10,8 +10,8 @@ public class DRReceiptTemp {
     //private String text = "BananaOrange apple";
     private String text = "";
 
-    public DRReceiptTemp (){
-
+    public DRReceiptTemp (String text){
+        this.text = text;
     }
 
     public String getText(){
