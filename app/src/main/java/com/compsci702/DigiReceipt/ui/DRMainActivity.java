@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.SQLException;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 import com.compsci702.DigiReceipt.ui.model.DRReceiptTemp;
 import com.compsci702.DigiReceipt.ui.receipts.DRViewReceiptsFragment;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,8 +41,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.Observable;
+import rx.Observer;
+import rx.Single;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.SingleSubscriber;
 
 import static com.compsci702.DigiReceipt.util.DRFileUtil.generateMediaFile;
 
@@ -198,7 +207,30 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
    	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	private void addReceipt(final DRReceiptTemp receiptTemp){
-		Log.i("DRMainActivity","----Add receipt in MainActivity----");
+		new Thread(new Runnable() {
+			public void run() {
+				Log.i("DRMainActivity","----Add receipt in MainActivity with new thread----");
+				//Dummy Data
+				DRReceipt receipt = new DRReceipt() {
+
+					@NonNull @Override public int getId() {
+						return 0;
+					}
+
+					@NonNull @Override public String getFilename() {
+
+						return uri.toString();
+					}
+
+					@Override public String getTags() {
+						return receiptTemp.getText();
+					}
+				};
+
+				mApplicationHub.addReceipt(receipt);
+			}
+		}).start();
+		/*Log.i("DRMainActivity","----Add receipt in MainActivity----");
 		//Dummy Data
 		DRReceipt receipt = new DRReceipt() {
 
@@ -206,28 +238,22 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 				return 0;
 			}
 
-			@Override
-			public String getText() {
-				return receiptTemp.getText();
-			}
-
 			@NonNull @Override public String getFilename() {
-				return "C://DigiReceipt4";
+
+				return uri.toString();
 			}
 
 			@Override public String getTags() {
-				return "BananaOrange apple";
+				return receiptTemp.getText();
 			}
 		};
 
-		mApplicationHub.addReceipt(receipt);
-		Log.i("DRMainActivity", "----Added receipt in MainActivity---- ID: "+ receipt.getId());
-		Log.i("DRMainActivity", "----Added receipt in MainActivity---- File path: "+ receipt.getFilename());
-		Log.i("DRMainActivity", "----Added receipt in MainActivity---- Tags: "+ receipt.getTags());
+		mApplicationHub.addReceipt(receipt);*/
 	}
 
 	private void getReceipts() throws SQLException {
 		Log.i("DRMainActivity","----Get receipt in MainActivity----");
+
 		try{
 			List<DRReceiptDb> receipts = mApplicationHub.getReceipt();
 			for (DRReceiptDb receipt : receipts){
@@ -262,6 +288,7 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 			e.printStackTrace();
 		}
 	}
+
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * general methods
