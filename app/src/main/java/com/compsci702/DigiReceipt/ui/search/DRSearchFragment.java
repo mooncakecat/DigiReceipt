@@ -7,6 +7,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,26 +40,28 @@ import rx.schedulers.Schedulers;
  */
 public class DRSearchFragment extends DRBaseFragment<DRSearchFragment.FragmentListener> implements
 		DRReceiptsRecyclerViewAdapter.AdapterListener {
-
-    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    
+	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	 * FragmentListener
      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	public interface FragmentListener {
-
+		void onReceiptSelected(String receiptFilename);
 	}
 
-	private static final int QUERY_UPDATE_DELAY_SECONDS = 1;
-	private static final int MINIMUM_QUERY_LENGTH = 1;
+	private static final String TAG = DRSearchFragment.class.getSimpleName();
 
-	private static final int GRID_COLUMNS = 4;
+	private static final int QUERY_UPDATE_DELAY_SECONDS = 1;
+	private static final int MINIMUM_QUERY_LENGTH = 3;
+
+	private static final int GRID_COLUMNS = 2;
 
 	private final DRApplicationHub mApplicationHub = DRApplication.getApplicationHub();
 	private Subscription mSearchFilterSubscription;
+	private Subscription mSearchSubscription;
 	private List<DRReceipt> mReceipts = new ArrayList<>();
 
 	private DRReceiptsRecyclerViewAdapter mAdapter;
-	private String mQuery;
 
 	@BindView(R.id.recyclerview) RecyclerView mRecyclerView;
 
@@ -89,7 +92,17 @@ public class DRSearchFragment extends DRBaseFragment<DRSearchFragment.FragmentLi
 		mRecyclerView.setHasFixedSize(true);
 	}
 
-    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	@Override public void onDestroyView() {
+		super.onDestroyView();
+		mSearchFilterSubscription.unsubscribe();
+	}
+
+	@Override public void onStop() {
+		super.onStop();
+		cancelSearch();
+	}
+
+	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      *  base class overrides
      *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -150,19 +163,31 @@ public class DRSearchFragment extends DRBaseFragment<DRSearchFragment.FragmentLi
 		});
 	}
 
+	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ 	 * search
+ 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	
+	private void cancelSearch() {
+		if (mSearchSubscription != null) {
+			mSearchSubscription.unsubscribe();
+		}
+	}
+	
 	private void search(@NonNull final String query) {
 
+		cancelSearch();
+		
 		Observable<List<? extends DRReceipt>> searchObservable = mApplicationHub.searchReceipt(query)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread());
 
-		searchObservable.subscribe(new Observer<List<? extends DRReceipt>>() {
+		mSearchSubscription = searchObservable.subscribe(new Observer<List<? extends DRReceipt>>() {
 			@Override public void onCompleted() {
 
 			}
 
 			@Override public void onError(Throwable e) {
-
+				Log.i(TAG, "Error: ", e);
 			}
 
 			@Override public void onNext(List<? extends DRReceipt> receipts) {
@@ -175,6 +200,7 @@ public class DRSearchFragment extends DRBaseFragment<DRSearchFragment.FragmentLi
 
 	@Override public void onReceiptSelected(String receiptFilename) {
 		// FIXME: 4/14/2017 open the receipt up!
+		mListener.onReceiptSelected(receiptFilename);
 	}
 
 }

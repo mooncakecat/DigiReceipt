@@ -58,4 +58,8 @@ public class DRSearchActivity extends AppCompatActivity implements DRSearchFragm
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override public void onReceiptSelected(String receiptFilename) {
+        DRImageActivity.startActivity(this, receiptFilename);
+    }
 }

@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.compsci702.DigiReceipt.R;
+import com.compsci702.DigiReceipt.core.DRApplication;
+import com.compsci702.DigiReceipt.core.DRApplicationHub;
 import com.compsci702.DigiReceipt.ui.base.DRBaseFragment;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 
@@ -17,6 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import rx.Observable;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Display an image
@@ -38,6 +44,8 @@ public class DRImageFragment extends DRBaseFragment<DRImageFragment.FragmentList
 	private static final String KEY_STARTING_RECEIPT_FILENAME = "key_starting_receipt_filename";
 
 	DRImagePagerAdapter mAdapter;
+	
+	DRApplicationHub mApplicationHub = DRApplication.getApplicationHub();
 	final List<DRReceipt> mReceipts = new ArrayList<>();
 
 	private String mStartingReceiptFilename;
@@ -71,42 +79,47 @@ public class DRImageFragment extends DRBaseFragment<DRImageFragment.FragmentList
 		if (getArguments() != null) {
 			mStartingReceiptFilename = getArguments().getString(KEY_STARTING_RECEIPT_FILENAME);
 		}
-
-		// FIXME: 4/2/2017 Should be done on a new thread
-		String path = String.valueOf(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES));
-		File directory = new File(path);
-		final File[] files = directory.listFiles();
-
-		// reverse order to show latest receipts at the top
-		for (int i = files.length - 1; i > -1; i--) {
-			final String filePath = files[i].getAbsolutePath();
-			DRReceipt receipt = new DRReceipt() {
-				@Override public int getId() {
-					return 0;
-				}
-
-				@Override public String getFilename() {
-					return filePath;
-				}
-
-				@Override public String getTags() {
-					return null;
-				}
-			};
-			mReceipts.add(receipt);
-		}
-
-		mAdapter.notifyDataSetChanged();
-
-		int startingIndex = 0;
-		for (int index = 0; index < mReceipts.size(); index++) {
-			if (mReceipts.get(index).getFilename().equals(mStartingReceiptFilename)) {
-				startingIndex = index;
-			}
-		}
-		mViewPager.setCurrentItem(startingIndex);
 	}
 
+	@Override public void onStart() {
+		super.onStart();
+		requestReceipts();
+	}
+	
+	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  	 * request receipts
+  	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+	private void requestReceipts() {
+		final Observable<List<? extends DRReceipt>> receipts = mApplicationHub.getReceipts()
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread());
+
+		receipts.subscribe(new Observer<List<? extends DRReceipt>>() {
+			@Override public void onNext(List<? extends DRReceipt> receipts) {
+				mReceipts.clear();
+				mReceipts.addAll(receipts);
+				mAdapter.notifyDataSetChanged();
+
+				int startingIndex = 0;
+				for (int index = 0; index < mReceipts.size(); index++) {
+					if (mReceipts.get(index).getFilename().equals(mStartingReceiptFilename)) {
+						startingIndex = index;
+					}
+				}
+				mViewPager.setCurrentItem(startingIndex);
+			}
+
+			@Override public void onCompleted() {
+
+			}
+
+			@Override public void onError(Throwable e) {
+
+			}
+		});
+	}
+	
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	 * base class overrides
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

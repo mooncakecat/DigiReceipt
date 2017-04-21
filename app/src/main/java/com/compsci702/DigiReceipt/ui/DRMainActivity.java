@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.SQLException;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,16 +39,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import rx.Observable;
-import rx.Observer;
-import rx.Single;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.SingleSubscriber;
 
 import static com.compsci702.DigiReceipt.util.DRFileUtil.generateMediaFile;
 
@@ -62,11 +56,13 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
 	static final int REQUEST_IMAGE_CAPTURE = 1;
 	static final int REQUEST_CODE = 5;
-    public static Uri uri = null;
+	
+	private static final String TAG = DRMainActivity.class.getSimpleName();
+	public static Uri uri = null;
 
 	DRApplicationHub mApplicationHub = DRApplication.getApplicationHub();
-	private List<DRReceiptDb> mReceipts = new ArrayList<>();
-
+	private Subscription mAddReceiptSubscription;
+	
 	@BindView(R.id.fragment_container) FrameLayout mFragmentContainer;
 	@BindView(R.id.toolbar) Toolbar mToolbar;
 
@@ -88,6 +84,11 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 					.add(R.id.fragment_container, DRMainFragment.newInstance(), "DRMainFragment")
 					.commit();
 		}
+	}
+
+	@Override protected void onStop() {
+		super.onStop();
+		cancelAddReceipt();
 	}
 
 	@Override public boolean onCreateOptionsMenu(Menu menu) {
@@ -129,12 +130,6 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
 	@Override public void onReceiptSelected(String receiptFilename) {
 		DRImageActivity.startActivity(this, receiptFilename);
-		//Test for DB
-		try {
-			getReceipts();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -170,12 +165,10 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
 	@Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-			Toast.makeText(this, R.string.image_saved, Toast.LENGTH_SHORT).show();
 			try {
                 getTextFromObservable(uri.toString());
-				//addReceipt();
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "Error: ", e);
             }
         }
 
@@ -191,7 +184,7 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
             @Override
             public void onError(Throwable e) {
-
+				Log.e(TAG, "Error: ", e);
             }
 
             @Override
@@ -206,40 +199,20 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
      * test for DB
    	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+	private void cancelAddReceipt() {
+		if (mAddReceiptSubscription != null) mAddReceiptSubscription.unsubscribe();
+	}
+
 	private void addReceipt(final DRReceiptTemp receiptTemp){
-		new Thread(new Runnable() {
-			public void run() {
-				Log.i("DRMainActivity","----Add receipt in MainActivity with new thread----");
-				//Dummy Data
-				DRReceipt receipt = new DRReceipt() {
-
-					@NonNull @Override public int getId() {
-						return 0;
-					}
-
-					@NonNull @Override public String getFilename() {
-
-						return uri.toString();
-					}
-
-					@Override public String getTags() {
-						return receiptTemp.getText();
-					}
-				};
-
-				mApplicationHub.addReceipt(receipt);
-			}
-		}).start();
-		/*Log.i("DRMainActivity","----Add receipt in MainActivity----");
-		//Dummy Data
+		
+		cancelAddReceipt();
+		
 		DRReceipt receipt = new DRReceipt() {
-
 			@NonNull @Override public int getId() {
 				return 0;
 			}
 
 			@NonNull @Override public String getFilename() {
-
 				return uri.toString();
 			}
 
@@ -247,49 +220,27 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 				return receiptTemp.getText();
 			}
 		};
-
-		mApplicationHub.addReceipt(receipt);*/
-	}
-
-	private void getReceipts() throws SQLException {
-		Log.i("DRMainActivity","----Get receipt in MainActivity----");
-
-		try{
-			List<DRReceiptDb> receipts = mApplicationHub.getReceipt();
-			for (DRReceiptDb receipt : receipts){
-				Log.i("DRMainActivity", "----Get receipt in MainActivity---- ID: "+ receipt.getId());
-				Log.i("DRMainActivity", "----Get receipt in MainActivity---- File path: "+ receipt.getFilename());
-				Log.i("DRMainActivity", "----Get receipt in MainActivity---- Tags: "+ receipt.getTags());
+		
+		Observable<? extends DRReceipt> observable = mApplicationHub.addReceipt(receipt)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread());
+		
+		mAddReceiptSubscription = observable.subscribe(new Observer<DRReceipt>() {
+			@Override public void onNext(DRReceipt receipt) {
+				Log.i(TAG, "Receipt added successfully: " + receipt);
 			}
-			Log.i("DRMainActivity", "----Get receipt in MainActivity---- Size: "+ receipts.size());
 
-			final List<DRReceipt> searchReceiptResults = new ArrayList<>();
-			Observable<List <? extends DRReceipt>> searchObservable = mApplicationHub.searchReceipt("Apple")
-					.subscribeOn(Schedulers.io())
-					.observeOn(AndroidSchedulers.mainThread());
+			@Override public void onCompleted() {
+				// do nothing
+			}
 
-			searchObservable.subscribe(new Subscriber<List<? extends DRReceipt>>() {
-				@Override public void onCompleted() {
-					Log.i("do","dop");
-				}
-
-				@Override public void onError(Throwable e) {
-					Log.i("MainActivity", "error: ", e);
-				}
-
-				@Override public void onNext(List<? extends DRReceipt> receipts) {
-					searchReceiptResults.clear();
-					searchReceiptResults.addAll(receipts);
-				}
-			});
-
-		}
-		catch (java.sql.SQLException e) {
-			e.printStackTrace();
-		}
+			@Override public void onError(Throwable e) {
+				Log.e(TAG, "Error in addReceipt: ", e);
+			}
+		});
 	}
 
-
+	
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * general methods
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

@@ -11,14 +11,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.compsci702.DigiReceipt.R;
+import com.compsci702.DigiReceipt.core.DRApplication;
+import com.compsci702.DigiReceipt.core.DRApplicationHub;
+import com.compsci702.DigiReceipt.database.DRReceiptDb;
 import com.compsci702.DigiReceipt.ui.base.DRBaseFragment;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import rx.Observable;
+import rx.Observer;
+import rx.Single;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Display a list of digitalised receipts
@@ -33,7 +42,8 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 	public interface FragmentListener {
 		void onReceiptSelected(String receiptFilename);
 	}
-
+	
+	DRApplicationHub mApplicationHub = DRApplication.getApplicationHub();
 	private static final int GRID_COLUMNS = 2;
 
 	private DRReceiptsRecyclerViewAdapter mAdapter;
@@ -59,34 +69,7 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 	}
 
 	@Override protected void onViewCreated(Bundle savedInstanceState) {
-
-		// FIXME: 4/2/2017 Should be done on a new thread
-		String path = String.valueOf(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES));
-		File directory = new File(path);
-		final File[] files = directory.listFiles();
-		Log.i("GetFiles", path);
-
-		// reverse order to show latest receipts at the top
-		if (files != null) {
-			for (int i = files.length - 1; i > -1; i--) {
-				final String filePath = files[i].getAbsolutePath();
-				DRReceipt receipt = new DRReceipt() {
-					@Override public int getId() {
-						return 0;
-					}
-
-					@Override public String getFilename() {
-						return filePath;
-					}
-
-					@Override public String getTags() {
-						return null;
-					}
-				};
-				mReceipts.add(receipt);
-			}
-		}
-
+		
 		mAdapter = new DRReceiptsRecyclerViewAdapter(getActivity(), mReceipts, this);
 		mAdapter.notifyDataSetChanged();
 
@@ -96,6 +79,37 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 		mRecyclerView.setHasFixedSize(true);
 	}
 
+	@Override public void onStart() {
+		super.onStart();
+		requestReceipts();
+	}
+
+	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  	 * request receipts
+  	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	
+	private void requestReceipts() {
+			final Observable<List<? extends DRReceipt>> receipts = mApplicationHub.getReceipts()
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread());
+		
+			receipts.subscribe(new Observer<List<? extends DRReceipt>>() {
+				@Override public void onCompleted() {
+					
+				}
+
+				@Override public void onError(Throwable e) {
+
+				}
+
+				@Override public void onNext(List<? extends DRReceipt> receipts) {
+					mReceipts.clear();
+					mReceipts.addAll(receipts);
+					mAdapter.notifyDataSetChanged();
+				}
+			});
+	}
+
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	  * DRReceiptsRecyclerViewAdapter.AdapterListener
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -103,17 +117,16 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 	@Override public void onReceiptSelected(String receiptFilename) {
 		mListener.onReceiptSelected(receiptFilename);
 	}
-
-  /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   * base class overrides
-   * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	
+	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	 * base class overrides
+	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	@NonNull @Override protected Class getFragmentListenerClass() {
 		return FragmentListener.class;
 	}
 
 	@Override protected void updateView() {
-
 	}
 
 	@NonNull @Override public String getScreenTitle() {

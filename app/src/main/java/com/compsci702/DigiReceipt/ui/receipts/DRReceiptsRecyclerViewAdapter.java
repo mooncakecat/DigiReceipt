@@ -29,7 +29,7 @@ public class DRReceiptsRecyclerViewAdapter extends RecyclerView.Adapter<DRReceip
     @NonNull private final Context mContext;
     @NonNull private final AdapterListener mAdapterListener;
 
-    public interface AdapterListener {
+	public interface AdapterListener {
         void onReceiptSelected(String receiptFilename);
     }
 
@@ -77,9 +77,9 @@ public class DRReceiptsRecyclerViewAdapter extends RecyclerView.Adapter<DRReceip
         }
 
         public void updateView(@NonNull DRReceipt receipt) {
-          mReceipt = receipt;
-          String thumbnailURL = DRImageUtil.getImageUrl(receipt.getFilename());
-          Glide.with(mContext).load(Uri.parse(thumbnailURL)).asBitmap().centerCrop().into(mThumbnailView);
+          	mReceipt = receipt;
+			String thumbnailUrl = receipt.getFilename();
+          	Glide.with(mContext).load(Uri.parse(thumbnailUrl)).asBitmap().centerCrop().into(mThumbnailView);
         }
 
         @Override public void onClick(View view) {

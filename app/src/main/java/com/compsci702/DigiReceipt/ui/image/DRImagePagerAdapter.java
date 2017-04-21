@@ -99,7 +99,7 @@ class DRImagePagerAdapter extends PagerAdapter {
 		}
 
 		void updateView(DRReceipt receipt) {
-			String imageURL = DRImageUtil.getImageUrl(receipt.getFilename());
+			String imageURL = receipt.getFilename();
 			Glide.with(mLayout.getContext()).load(Uri.parse(imageURL)).fitCenter().into(mImageView);
 		}
 	}
