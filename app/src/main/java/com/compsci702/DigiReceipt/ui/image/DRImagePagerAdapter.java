@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.compsci702.DigiReceipt.R;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
-import com.compsci702.DigiReceipt.util.DRImageUtil;
 
 import java.util.List;
 

@@ -199,7 +199,6 @@ public class DRSearchFragment extends DRBaseFragment<DRSearchFragment.FragmentLi
 	}
 
 	@Override public void onReceiptSelected(String receiptFilename) {
-		// FIXME: 4/14/2017 open the receipt up!
 		mListener.onReceiptSelected(receiptFilename);
 	}
 
