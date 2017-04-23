@@ -1,11 +1,11 @@
 package com.compsci702.DigiReceipt.core;
 
 import android.os.Environment;
-import android.util.Log;
 
 import com.compsci702.DigiReceipt.ui.model.DRReceiptTemp;
 import com.google.api.client.util.Base64;
 import com.google.gson.Gson;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Scanner;
+
 import rx.Observable;
 import rx.Subscriber;
 

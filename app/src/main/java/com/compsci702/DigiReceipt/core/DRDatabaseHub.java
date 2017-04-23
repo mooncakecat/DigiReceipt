@@ -10,7 +10,6 @@ import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.Callable;
 

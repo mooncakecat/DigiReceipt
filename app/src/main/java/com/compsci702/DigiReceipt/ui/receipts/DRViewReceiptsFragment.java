@@ -1,11 +1,9 @@
 package com.compsci702.DigiReceipt.ui.receipts;
 
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,19 +11,15 @@ import android.view.ViewGroup;
 import com.compsci702.DigiReceipt.R;
 import com.compsci702.DigiReceipt.core.DRApplication;
 import com.compsci702.DigiReceipt.core.DRApplicationHub;
-import com.compsci702.DigiReceipt.database.DRReceiptDb;
 import com.compsci702.DigiReceipt.ui.base.DRBaseFragment;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 
-import java.io.File;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import rx.Observable;
 import rx.Observer;
-import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 

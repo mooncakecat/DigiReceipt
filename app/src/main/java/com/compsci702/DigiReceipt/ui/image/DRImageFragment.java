@@ -1,7 +1,6 @@
 package com.compsci702.DigiReceipt.ui.image;
 
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -14,7 +13,6 @@ import com.compsci702.DigiReceipt.core.DRApplicationHub;
 import com.compsci702.DigiReceipt.ui.base.DRBaseFragment;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,19 +1,12 @@
 package com.compsci702.DigiReceipt.core;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
-import com.compsci702.DigiReceipt.database.DRReceiptDb;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import rx.Observable;
-import rx.Observer;
-import rx.Single;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Application hub.
