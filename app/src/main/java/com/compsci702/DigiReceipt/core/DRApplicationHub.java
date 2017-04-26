@@ -13,10 +13,7 @@ import rx.Observable;
  */
 public class DRApplicationHub {
 
-	private static final String TAG = "DRApplicationHub";
-
 	private final DRDatabaseHub mDatabaseHub = DRApplication.getDatabaseHub();
-	private final DRNetworkHub mNetworkHub = DRApplication.getNetworkHub();
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	 * receipts
@@ -44,4 +41,5 @@ public class DRApplicationHub {
 	public Observable<List<? extends DRReceipt>> searchReceipt(@NonNull String query) {
 		return mDatabaseHub.searchReceipts(query).toObservable();
 	}
+	
 }
