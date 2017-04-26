@@ -18,9 +18,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.compsci702.DigiReceipt.ui.DRSplashActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-        <activity
             android:name="com.compsci702.DigiReceipt.ui.DRMainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
