@@ -20,20 +20,21 @@ import rx.Subscriber;
 /**
  * Database Hub.
  */
-public class DRDatabaseHub {
+class DRDatabaseHub {
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      * member variables
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    
     @NonNull private final DRDbHelper mDbHelper;
 
 	private Dao<DRReceiptDb, Integer> receiptDao;
 
-
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      * constructor
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-    public DRDatabaseHub() {
+    
+    DRDatabaseHub() {
         mDbHelper = DRApplication.getDbHelper();
     }
 
@@ -49,7 +50,7 @@ public class DRDatabaseHub {
      * and emits a single value (the receipt from the database), then completes.
      * Unsubscribing from this observable will not cancel the addition.
      */
-    @NonNull public Observable<? extends DRReceipt> addReceipt(@NonNull final DRReceipt receipt) {
+    @NonNull Observable<? extends DRReceipt> addReceipt(@NonNull final DRReceipt receipt) {
         final Dao<DRReceiptDb, ?> dao = mDbHelper.getTable(DRReceiptDb.class);
         return Observable.create(new Observable.OnSubscribe<DRReceiptDb>() {
             @Override public void call(Subscriber<? super DRReceiptDb> subscriber) {
@@ -94,7 +95,7 @@ public class DRDatabaseHub {
      * list (the receipt details) then complete.
      * @return Return a list of receipts.
      */
-    public Single<List<? extends DRReceipt>> getReceipts() {
+	@NonNull Single<List<? extends DRReceipt>> getReceipts() {
 		return Single.fromCallable(new Callable<List<? extends DRReceipt>>() {
 			@Override public List<? extends DRReceipt> call() throws Exception {
 				final Dao<DRReceiptDb, ?> receiptTable = mDbHelper.getTable(DRReceiptDb.class);
@@ -107,14 +108,13 @@ public class DRDatabaseHub {
      * search receipts
      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    public Single<List<? extends DRReceipt>> searchReceipts(@NonNull final String query){
+    @NonNull Single<List<? extends DRReceipt>> searchReceipts(@NonNull final String query){
 		return Single.fromCallable(new Callable<List<? extends DRReceipt>>() {
 			@Override public List<? extends DRReceipt> call() throws Exception {
                 receiptDao = mDbHelper.getReceiptDao();
 				PreparedQuery preparedQuery = receiptDao.queryBuilder().where().like(DRReceiptDb.COLUMN_TAGS, "%"
                         + query + "%").prepare();
-				List<DRReceiptDb> receipts = receiptDao.query(preparedQuery);
-				return receipts;
+				return receiptDao.query(preparedQuery);
 			}
 		});
 	}
