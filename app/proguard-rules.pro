@@ -18,3 +18,8 @@
 
 -dontwarn com.google.**
 -dontwarn rx.**
+
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
