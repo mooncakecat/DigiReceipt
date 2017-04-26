@@ -15,6 +15,7 @@ import com.compsci702.DigiReceipt.ui.base.DRBaseFragment;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -36,7 +37,7 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 	public interface FragmentListener {
 		void onReceiptSelected(String receiptFilename);
 	}
-	
+
 	DRApplicationHub mApplicationHub = DRApplication.getApplicationHub();
 	private static final int GRID_COLUMNS = 2;
 
@@ -50,8 +51,7 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	public static DRViewReceiptsFragment newInstance() {
-		DRViewReceiptsFragment viewReceiptFragment = new DRViewReceiptsFragment();
-		return viewReceiptFragment;
+		return new DRViewReceiptsFragment();
 	}
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -63,7 +63,7 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 	}
 
 	@Override protected void onViewCreated(Bundle savedInstanceState) {
-		
+
 		mAdapter = new DRReceiptsRecyclerViewAdapter(getActivity(), mReceipts, this);
 		mAdapter.notifyDataSetChanged();
 
@@ -81,27 +81,28 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   	 * request receipts
   	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-	
+
 	private void requestReceipts() {
-			final Observable<List<? extends DRReceipt>> receipts = mApplicationHub.getReceipts()
-					.subscribeOn(Schedulers.io())
-					.observeOn(AndroidSchedulers.mainThread());
-		
-			receipts.subscribe(new Observer<List<? extends DRReceipt>>() {
-				@Override public void onCompleted() {
-					
-				}
+		final Observable<List<? extends DRReceipt>> receipts = mApplicationHub.getReceipts()
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread());
 
-				@Override public void onError(Throwable e) {
+		receipts.subscribe(new Observer<List<? extends DRReceipt>>() {
+			@Override public void onNext(List<? extends DRReceipt> receipts) {
+				mReceipts.clear();
+				Collections.reverse(receipts);
+				mReceipts.addAll(receipts);
+				mAdapter.notifyDataSetChanged();
+			}
 
-				}
+			@Override public void onCompleted() {
 
-				@Override public void onNext(List<? extends DRReceipt> receipts) {
-					mReceipts.clear();
-					mReceipts.addAll(receipts);
-					mAdapter.notifyDataSetChanged();
-				}
-			});
+			}
+
+			@Override public void onError(Throwable e) {
+
+			}
+		});
 	}
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

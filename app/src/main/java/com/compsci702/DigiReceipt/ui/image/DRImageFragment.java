@@ -14,6 +14,7 @@ import com.compsci702.DigiReceipt.ui.base.DRBaseFragment;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -96,6 +97,7 @@ public class DRImageFragment extends DRBaseFragment<DRImageFragment.FragmentList
 		receipts.subscribe(new Observer<List<? extends DRReceipt>>() {
 			@Override public void onNext(List<? extends DRReceipt> receipts) {
 				mReceipts.clear();
+				Collections.reverse(receipts);
 				mReceipts.addAll(receipts);
 				mAdapter.notifyDataSetChanged();
 
