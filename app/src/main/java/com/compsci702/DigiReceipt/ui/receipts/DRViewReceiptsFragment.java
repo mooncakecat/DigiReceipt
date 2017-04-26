@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import java.util.List;
 import butterknife.BindView;
 import rx.Observable;
 import rx.Observer;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -29,16 +31,17 @@ import rx.schedulers.Schedulers;
  */
 public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragment.FragmentListener> implements
 		DRReceiptsRecyclerViewAdapter.AdapterListener {
-
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * FragmentListener
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	public interface FragmentListener {
+
 		void onReceiptSelected(String receiptFilename);
 	}
-
 	DRApplicationHub mApplicationHub = DRApplication.getApplicationHub();
+	private Subscription mReceiptsSubscription;
+
 	private static final int GRID_COLUMNS = 2;
 
 	private DRReceiptsRecyclerViewAdapter mAdapter;
@@ -78,16 +81,28 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 		requestReceipts();
 	}
 
+	@Override public void onStop() {
+		super.onStop();
+		cancelRequestReceipts();
+	}
+
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   	 * request receipts
   	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+	private void cancelRequestReceipts() {
+		if (mReceiptsSubscription != null) mReceiptsSubscription.unsubscribe();
+	}
+	
 	private void requestReceipts() {
-		final Observable<List<? extends DRReceipt>> receipts = mApplicationHub.getReceipts()
+		
+		cancelRequestReceipts();
+		
+		final Observable<List<? extends DRReceipt>> observable = mApplicationHub.getReceipts()
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread());
 
-		receipts.subscribe(new Observer<List<? extends DRReceipt>>() {
+		mReceiptsSubscription = observable.subscribe(new Observer<List<? extends DRReceipt>>() {
 			@Override public void onNext(List<? extends DRReceipt> receipts) {
 				mReceipts.clear();
 				Collections.reverse(receipts);
@@ -100,7 +115,7 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 			}
 
 			@Override public void onError(Throwable e) {
-
+				Log.e("Something", "Error: ", e);
 			}
 		});
 	}
