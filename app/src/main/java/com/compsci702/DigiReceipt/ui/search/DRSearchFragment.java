@@ -168,9 +168,8 @@ public class DRSearchFragment extends DRBaseFragment<DRSearchFragment.FragmentLi
  	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	private void cancelSearch() {
-		if (mSearchSubscription != null) {
-			mSearchSubscription.unsubscribe();
-		}
+		if (mSearchSubscription != null) mSearchSubscription.unsubscribe();
+		
 	}
 	
 	private void search(@NonNull final String query) {
