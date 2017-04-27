@@ -168,7 +168,7 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
 	}
     private void getTextFromObservable(String uriForFilePath){
-        DRNetworkHub.httpObservable(uriForFilePath.toString()).
+        DRNetworkHub.httpObservable(uriForFilePath).
                 subscribeOn(Schedulers.newThread()).
                 observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<DRReceiptTemp>() {
             @Override
@@ -202,7 +202,7 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 		cancelAddReceipt();
 		
 		DRReceipt receipt = new DRReceipt() {
-			@NonNull @Override public int getId() {
+			@Override public int getId() {
 				return 0;
 			}
 
