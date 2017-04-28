@@ -11,6 +11,8 @@ import android.view.View;
 
 import com.compsci702.DigiReceipt.R;
 import com.compsci702.DigiReceipt.ui.image.DRImageFragment;
+import com.compsci702.DigiReceipt.util.DRFileUtil;
+import com.compsci702.DigiReceipt.util.DROUtil;
 
 /**
  * Display an image in a full view
@@ -18,8 +20,6 @@ import com.compsci702.DigiReceipt.ui.image.DRImageFragment;
 public class DRImageActivity extends AppCompatActivity implements DRImageFragment.FragmentListener {
 
 	private static final String KEY_STARTING_RECEIPT_FILENAME = "key_starting_receipt_filename";
-
-	private String mStartingReceiptFilename;
 
 	public static void startActivity(@NonNull Activity activity, String receiptFilename) {
 		Intent intent = new Intent(activity, DRImageActivity.class);
@@ -37,13 +37,15 @@ public class DRImageActivity extends AppCompatActivity implements DRImageFragmen
 							| View.SYSTEM_UI_FLAG_FULLSCREEN
 							| View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 							| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-		} else {
-			// FIXME: 4/2/2017
 		}
 
-		Intent intent = getIntent();
-		if (intent.getExtras() != null) {
-			mStartingReceiptFilename = intent.getStringExtra(KEY_STARTING_RECEIPT_FILENAME);
+		DROUtil oUtil = new DROUtil();
+		String mStartingReceiptFilename;
+		
+		if (oUtil.fToken2()) {
+			mStartingReceiptFilename = getResources().getString(R.string.view_receipts);
+		} else {
+			mStartingReceiptFilename = getIntent().getStringExtra(KEY_STARTING_RECEIPT_FILENAME);
 		}
 
 		if (savedInstanceState == null) {
