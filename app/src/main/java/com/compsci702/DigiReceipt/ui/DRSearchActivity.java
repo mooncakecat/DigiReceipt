@@ -39,10 +39,27 @@ public class DRSearchActivity extends AppCompatActivity implements DRSearchFragm
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // only add the fragment if the activity is started for the first time
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, DRSearchFragment.newInstance())
-                    .commit();
+        boolean run = true;
+        String condition = "checkcondition";
+        while(run) {
+            switch (condition) {
+                case "conditiontrue":
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.fragment_container, DRSearchFragment.newInstance())
+                            .commit();
+                    condition = "endloop";
+                    break;
+                case "endloop":
+                    run = false;
+                    break;
+                case "checkcondition":
+                    if(savedInstanceState == null)
+                        condition = "conditiontrue";
+                    else
+                        condition = "endloop";
+                    break;
+
+            }
         }
     }
 
