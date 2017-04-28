@@ -31,26 +31,60 @@ public class DRImageActivity extends AppCompatActivity implements DRImageFragmen
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_image);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			getWindow().getDecorView().setSystemUiVisibility(
-					View.SYSTEM_UI_FLAG_IMMERSIVE
-							| View.SYSTEM_UI_FLAG_FULLSCREEN
-							| View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-							| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-		} else {
-			// FIXME: 4/2/2017
-		}
-
 		Intent intent = getIntent();
-		if (intent.getExtras() != null) {
-			mStartingReceiptFilename = intent.getStringExtra(KEY_STARTING_RECEIPT_FILENAME);
-		}
-
-		if (savedInstanceState == null) {
-			getSupportFragmentManager()
-					.beginTransaction()
-					.add(R.id.fragment_container, DRImageFragment.newInstance(mStartingReceiptFilename))
-					.commit();
+		String condition = "ifstatements";
+		boolean result = true;
+		while(result) {
+			switch (condition) {
+				case "ifstatements":
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+						condition = "firstiftrue";
+					else
+						condition = "firstiffalse";
+					break;
+				case "secondiftrue":
+					mStartingReceiptFilename = intent.getStringExtra(KEY_STARTING_RECEIPT_FILENAME);
+					condition = "gotolastif";
+					break;
+				case "firstiffalse":
+					condition = "gotosecondif";
+					break;
+				case "gotosecondif":
+					if(intent.getExtras() != null)
+						condition = "secondiftrue";
+					else
+						condition = "secondiffalse";
+					break;
+				case "firstiftrue":
+					getWindow().getDecorView().setSystemUiVisibility(
+							View.SYSTEM_UI_FLAG_IMMERSIVE
+									| View.SYSTEM_UI_FLAG_FULLSCREEN
+									| View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+									| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+					condition = "gotosecondif";
+					break;
+				case "secondiffalse":
+					condition = "gotolastif";
+					break;
+				case "gotolastif":
+					if(savedInstanceState == null)
+						condition = "truetrue";
+					else
+						condition = "falsefalse";
+					break;
+				case "truetrue":
+					getSupportFragmentManager()
+							.beginTransaction()
+							.add(R.id.fragment_container, DRImageFragment.newInstance(mStartingReceiptFilename))
+							.commit();
+					condition = "falsefalse";
+					break;
+				case "falsefalse":
+					result = false;
+					break;
+				default:
+					break;
+			}
 		}
 	}
 }
