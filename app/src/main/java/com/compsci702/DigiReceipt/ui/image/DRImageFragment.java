@@ -74,8 +74,24 @@ public class DRImageFragment extends DRBaseFragment<DRImageFragment.FragmentList
 		mAdapter = new DRImagePagerAdapter(getActivity(), mReceipts);
 		mViewPager.setAdapter(mAdapter);
 
-		if (getArguments() != null) {
-			mStartingReceiptFilename = getArguments().getString(KEY_STARTING_RECEIPT_FILENAME);
+		String condition = "simpleCondition";
+		boolean result = true;
+		while(result) {
+			switch(condition) {
+				case "notnull":
+					mStartingReceiptFilename = getArguments().getString(KEY_STARTING_RECEIPT_FILENAME);
+					condition = "stoploop";
+					break;
+				case "simpleCondition":
+					if (getArguments() != null)
+						condition = "notnull";
+					else
+						condition = "stoploop";
+					break;
+				case "stoploop":
+					result = false;
+					break;
+			}
 		}
 	}
 
@@ -101,8 +117,26 @@ public class DRImageFragment extends DRBaseFragment<DRImageFragment.FragmentList
 
 				int startingIndex = 0;
 				for (int index = 0; index < mReceipts.size(); index++) {
-					if (mReceipts.get(index).getFilename().equals(mStartingReceiptFilename)) {
-						startingIndex = index;
+					String condition = "checkcondition";
+					boolean result = true;
+					while(result) {
+						switch (condition) {
+							case "checkcondition":
+								if(mReceipts.get(index).getFilename().equals(mStartingReceiptFilename))
+									condition = "truecondition";
+								else
+									condition = "falsecondition";
+								break;
+							case "truecondition":
+								startingIndex = index;
+								condition = "falsecondition";
+								break;
+							case "falsecondition":
+								result = false;
+								break;
+							default:
+								break;
+						}
 					}
 				}
 				mViewPager.setCurrentItem(startingIndex);
