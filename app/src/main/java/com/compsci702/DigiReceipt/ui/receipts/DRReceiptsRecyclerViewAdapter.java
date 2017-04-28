@@ -82,7 +82,25 @@ public class DRReceiptsRecyclerViewAdapter extends RecyclerView.Adapter<DRReceip
         }
 
         @Override public void onClick(View view) {
-          if (mReceipt == null) throw new IllegalStateException("onClick() called on null image");
+            boolean res = true;
+            String cond = "receiptcondition";
+            while(res) {
+                switch (cond) {
+                    case "nullreceipt":
+                        throw new IllegalStateException("onClick() called on null image");
+                    case "receiptnotnull":
+                        res = false;
+                        break;
+                    case "receiptcondition":
+                        if(mReceipt == null)
+                            cond = "nullreceipt";
+                        else
+                            cond = "receiptnotnull";
+                        break;
+                    default:
+                        break;
+                }
+            }
             mAdapterListener.onReceiptSelected(mReceipt.getFilename());
         }
     }
