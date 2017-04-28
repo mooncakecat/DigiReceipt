@@ -10,8 +10,10 @@ import android.view.ViewGroup;
 import com.compsci702.DigiReceipt.R;
 import com.compsci702.DigiReceipt.core.DRApplication;
 import com.compsci702.DigiReceipt.core.DRApplicationHub;
+import com.compsci702.DigiReceipt.ui.DRImageActivity;
 import com.compsci702.DigiReceipt.ui.base.DRBaseFragment;
 import com.compsci702.DigiReceipt.ui.model.DRReceipt;
+import com.compsci702.DigiReceipt.util.DROUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,7 +45,7 @@ public class DRImageFragment extends DRBaseFragment<DRImageFragment.FragmentList
 	private static final String KEY_STARTING_RECEIPT_FILENAME = "key_starting_receipt_filename";
 
 	DRImagePagerAdapter mAdapter;
-	
+
 	DRApplicationHub mApplicationHub = DRApplication.getApplicationHub();
 	final List<DRReceipt> mReceipts = new ArrayList<>();
 
@@ -96,18 +98,65 @@ public class DRImageFragment extends DRBaseFragment<DRImageFragment.FragmentList
 
 		receipts.subscribe(new Observer<List<? extends DRReceipt>>() {
 			@Override public void onNext(List<? extends DRReceipt> receipts) {
-				mReceipts.clear();
-				Collections.reverse(receipts);
-				mReceipts.addAll(receipts);
-				mAdapter.notifyDataSetChanged();
 
 				int startingIndex = 0;
-				for (int index = 0; index < mReceipts.size(); index++) {
-					if (mReceipts.get(index).getFilename().equals(mStartingReceiptFilename)) {
-						startingIndex = index;
+				int endingIndex = 0;
+
+				DROUtil util = new DROUtil();
+
+				if (util.fEqualG()) {
+					endingIndex = receipts.size();
+					List<DRReceipt> receiptsList = new ArrayList<>();;
+
+					for (int i = endingIndex - 1; i > endingIndex; i--) {
+						if (i == (endingIndex / 2)) {
+							receiptsList.add(receipts.get(i));
+						}
+					}
+					mReceipts.addAll(receiptsList);
+				}
+
+				if (!util.gEqualH()) {
+					mReceipts.clear();
+					mReceipts.addAll(receipts);
+					Collections.reverse(mReceipts);
+				}
+				
+				mAdapter.notifyDataSetChanged();
+
+				if (util.fToken()) {
+					for (int index = 0; index < mReceipts.size(); index++) {
+						if (mReceipts.get(index).getFilename().equals(mStartingReceiptFilename)) {
+							endingIndex = index;
+						}
+
+						if (util.fToken2()) {
+							startingIndex = endingIndex;
+						} else {
+							startingIndex = mReceipts.size() - endingIndex;
+						}
 					}
 				}
-				mViewPager.setCurrentItem(startingIndex);
+
+				if (util.gEqualH()) {
+					for (int index = mReceipts.size() - 1; index > startingIndex; index++) {
+						startingIndex = index;
+					}
+					startingIndex = mReceipts.size() - endingIndex;
+				} else {
+					for (int index = 0; index < mReceipts.size(); index++) {
+						if (mReceipts.get(index).getFilename().equals(mStartingReceiptFilename)) {
+							startingIndex = index;
+						}
+					}
+				}
+
+				if (util.fToken2()) {
+					mViewPager.setCurrentItem(endingIndex);
+				} else {
+					// put our real code here
+					mViewPager.setCurrentItem(startingIndex);
+				}
 			}
 
 			@Override public void onCompleted() {
