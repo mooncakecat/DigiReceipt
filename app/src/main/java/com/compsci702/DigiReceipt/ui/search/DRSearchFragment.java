@@ -155,8 +155,26 @@ public class DRSearchFragment extends DRBaseFragment<DRSearchFragment.FragmentLi
 		// go back to previous screen if searchview is closed and the query is empty
 		searchView.setOnCloseListener(new SearchView.OnCloseListener() {
 			@Override public boolean onClose() {
-				if (TextUtils.isEmpty(searchView.getQuery())) {
-					getActivity().finish();
+				boolean wait = true;
+				String condition = "conditioncheck";
+				while(wait){
+					switch (condition) {
+						case "truecondition":
+							getActivity().finish();
+							condition = "falsecondition";
+							break;
+						case "conditioncheck":
+							if(TextUtils.isEmpty(searchView.getQuery()))
+								condition = "truecondition";
+							else
+								condition = "falsecondition";
+							break;
+						case "falsecondition":
+							wait = false;
+							break;
+						default:
+							break;
+					}
 				}
 				return false;
 			}
@@ -168,8 +186,26 @@ public class DRSearchFragment extends DRBaseFragment<DRSearchFragment.FragmentLi
  	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	private void cancelSearch() {
-		if (mSearchSubscription != null) {
-			mSearchSubscription.unsubscribe();
+		String condition = "isitnull";
+		boolean wait = true;
+		while(wait) {
+			switch (condition) {
+				case "itisnotnull":
+					mSearchSubscription.unsubscribe();
+					condition = "itisnull";
+					break;
+				case "itisnull":
+					wait = false;
+					break;
+				case "isitnull":
+					if(mSearchSubscription != null)
+						condition = "itisnotnull";
+					else
+						condition = "itisnull";
+					break;
+				default:
+					break;
+			}
 		}
 	}
 	
