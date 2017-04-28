@@ -44,24 +44,45 @@ public abstract class DRBaseFragment<L> extends Fragment {
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
   @Override public void onAttach(Context context) {
-    super.onAttach(context);
+      super.onAttach(context);
 
-    // attempt to get listener instance from parent Fragment
-    Fragment parentFragment = getParentFragment();
-    Activity parentActivity = getActivity();
-
-    if (getFragmentListenerClass().isInstance(parentFragment)) {
-      //noinspection unchecked
-      mListener = (L) parentFragment;
-
-    } else if (getFragmentListenerClass().isInstance(parentActivity)) {
-      //noinspection unchecked
-      mListener = (L) parentActivity;
-
-    } else {
-      throw new IllegalStateException("Fragment attached to parent (" + parentActivity.getClass()
-        .getName() + ") without FragmentListener: " + getFragmentListenerClass());
-    }
+      // attempt to get listener instance from parent Fragment
+      Fragment parentFragment = getParentFragment();
+      Activity parentActivity = getActivity();
+      String condition = "checkcondition";
+      boolean startLoop = true;
+      while(startLoop) {
+          switch (condition) {
+              case "secondconditiontrue":
+                  mListener = (L) parentActivity;
+                  condition = "endloop";
+                  break;
+              case "elsecondition":
+                  throw new IllegalStateException("Fragment attached to parent (" + parentActivity.getClass()
+                          .getName() + ") without FragmentListener: " + getFragmentListenerClass());
+              case "checkcondition":
+                  if (getFragmentListenerClass().isInstance(parentFragment))
+                      condition = "conditiononetrue";
+                  else
+                      condition = "checkconditiontwo";
+                  break;
+              case "checkconditiontwo":
+                  if(getFragmentListenerClass().isInstance(parentActivity))
+                      condition = "secondconditiontrue";
+                  else
+                      condition = "elsecondition";
+                  break;
+              case "conditiononetrue":
+                  mListener = (L) parentFragment;
+                  condition = "endloop";
+                  break;
+              case "endloop":
+                  startLoop = false;
+                  break;
+              default:
+                  break;
+          }
+      }
   }
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
