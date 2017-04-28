@@ -73,11 +73,29 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
 		setSupportActionBar(mToolbar);
 
-		if (savedInstanceState == null) {
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.fragment_container, DRMainFragment.newInstance(), "DRMainFragment")
-					.commit();
-		}
+		String condition = "isitnull";
+        boolean run = true;
+        while(run) {
+            switch (condition) {
+                case "isitnull":
+                    if (savedInstanceState == null)
+                        condition = "yesitsnull";
+                    else
+                        condition = "noitsnot";
+                    break;
+                case "yesitsnull":
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.fragment_container, DRMainFragment.newInstance(), "DRMainFragment")
+                            .commit();
+                    condition = "noitsnot";
+                    break;
+                case "noitsnot":
+                    run = false;
+                    break;
+                default:
+                    break;
+            }
+        }
 	}
 
 	@Override protected void onStop() {
@@ -107,15 +125,38 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	@Override public void onAddReceiptSelected() {
-		if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager
-				.PERMISSION_GRANTED) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-				requestPermissions(new String[]{android.Manifest.permission.CAMERA, Manifest.permission
-						.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
-			}
-		} else {
-			dispatchTakePictureIntent();
-		}
+        String condition = "checkifstatement";
+        boolean run = true;
+        while(run) {
+            switch (condition) {
+                case "checkifstatement":
+                    if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                        condition = "nextifstatement";
+                    else
+                        condition = "gotoelse";
+                    break;
+                case "gotoelse":
+                    dispatchTakePictureIntent();
+                    condition = "finish";
+                    break;
+                case "nextifstatement":
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        requestPermissions(new String[]{android.Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
+                        condition = "finish";
+                    }
+                    else
+                        condition = "falsestatement";
+                    break;
+                case "falsestatement":
+                    condition = "finish";
+                    break;
+                case "finish":
+                    run = false;
+                    break;
+                default:
+                    break;
+            }
+        }
 	}
 
 	@Override public void onViewReceiptsSelected() {
@@ -132,41 +173,114 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
 	@Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		if (requestCode == REQUEST_CODE) {
-			if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-				// Now user should be able to use camera
-				dispatchTakePictureIntent();
-			} else {
-				// Your app will not have this permission. Turn off all functions
-				// that require this permission or it will force close
-				Toast.makeText(this, R.string.permissions_error, Toast.LENGTH_LONG).show();
-			}
-		}
+        String condition = "requestcode";
+        boolean run = true;
+        while(run) {
+            switch (condition) {
+                case "requestcode":
+                    if (requestCode == REQUEST_CODE)
+                        condition = "returnedtrue";
+                    else
+                        condition = "returnedfalse";
+                    break;
+                case "returnedtrue":
+                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                        condition = "processif";
+                    else
+                        condition = "processelse";
+                    break;
+                case "processelse":
+                    Toast.makeText(this, R.string.permissions_error, Toast.LENGTH_LONG).show();
+                    condition = "finish";
+                    break;
+                case "processif":
+                    dispatchTakePictureIntent();
+                    condition = "finish";
+                    break;
+                case "finish":
+                    run = false;
+                    break;
+                default:
+                    break;
+            }
+        }
 	}
 
 	private void dispatchTakePictureIntent() {
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
 		// Ensure that there's a camera activity to handle the intent
-		if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-			// This causes crashes on api 24 and above: Uri pictureURI = Uri.fromFile(generateMediaFile());
-			uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".fileprovider",
-					generateMediaFile());
-			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-			startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-		}
+        String condition = "checkif";
+        boolean run = true;
+        while(run) {
+            switch (condition) {
+                case "":
+                    break;
+                case "checkif":
+                    if (takePictureIntent.resolveActivity(getPackageManager()) != null)
+                        condition = "gototrue";
+                    else
+                        condition = "gotofalse";
+                    break;
+                case "gotoextra":
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                    condition = "startactivity";
+                    break;
+                case "gototrue":
+                    uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".fileprovider",
+                            generateMediaFile());
+                    condition = "gotoextra";
+                    break;
+                case "gotofalse":
+                    run = false;
+                    break;
+                case "startactivity":
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                    condition = "gotofalse";
+                    break;
+                default:
+                    break;
+            }
+        }
 	}
 
 	@Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-			try {
-                getTextFromObservable(uri.toString());
-            } catch (Exception e) {
-                Log.e(TAG, "Error: ", e);
+        String condition = "checkcodes";
+        boolean run = true;
+        while(run) {
+            switch (condition) {
+                case "secondtrue":
+                    try {
+                        getTextFromObservable(uri.toString());
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error: ", e);
+                    }
+                    condition = "endloop";
+                    break;
+                case "checkcodes":
+                    if (requestCode == REQUEST_IMAGE_CAPTURE)
+                        condition = "firsttrue";
+                    else
+                        condition = "iffalse";
+                    break;
+                case "firsttrue":
+                    if(resultCode == RESULT_OK)
+                        condition = "secondtrue";
+                    else
+                        condition = "iffalse";
+                    break;
+                case "endloop":
+                    run = false;
+                    break;
+                case "iffalse":
+                    condition = "endloop";
+                    break;
+                default:
+                    break;
             }
         }
-
 	}
+
     private void getTextFromObservable(String uriForFilePath){
         DRNetworkHub.httpObservable(uriForFilePath.toString()).
                 subscribeOn(Schedulers.newThread()).
@@ -194,7 +308,30 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
    	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	private void cancelAddReceipt() {
-		if (mAddReceiptSubscription != null) mAddReceiptSubscription.unsubscribe();
+        String condition = "addreceiptcondition";
+        boolean run = true;
+        while(run) {
+            switch (condition) {
+                case "dontaddreceipt":
+                    mAddReceiptSubscription.unsubscribe();
+                    condition = "endwhile";
+                    break;
+                case "addreceipt":
+                    condition = "endwhile";
+                    break;
+                case "addreceiptcondition":
+                    if(mAddReceiptSubscription != null)
+                        condition = "dontaddreceipt";
+                    else
+                        condition = "addreceipt";
+                    break;
+                case "endwhile":
+                    run = false;
+                    break;
+                default:
+                    break;
+            }
+        }
 	}
 
 	private void addReceipt(final DRReceiptTemp receiptTemp){
