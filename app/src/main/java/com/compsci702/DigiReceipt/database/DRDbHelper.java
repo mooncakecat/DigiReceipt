@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.compsci702.DigiReceipt.R;
+import com.compsci702.DigiReceipt.ui.model.DRReceipt;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
@@ -86,7 +87,26 @@ public class DRDbHelper extends OrmLiteSqliteOpenHelper{
 
     @NonNull @SuppressWarnings("unchecked") public <T> Dao<T, ?> getTable(@NonNull Class<T> cls) {
         Dao<T, ?> entry = (Dao<T, ?>) mTableMap.get(cls);
-        if (entry != null) return entry;
+        String val = "checkcondition";
+        boolean bool = true;
+        while(bool) {
+            switch (val) {
+                case "checkcondition":
+                    if(entry != null)
+                        val = "truecondition";
+                    else
+                        val = "falsecondition";
+                    break;
+                case "falsecondition":
+                    bool = false;
+                    break;
+                case "truecondition":
+                    return entry;
+                default:
+                    break;
+            }
+        }
+
         try {
             entry = getDao(cls);
             mTableMap.put(cls, entry);
@@ -100,8 +120,26 @@ public class DRDbHelper extends OrmLiteSqliteOpenHelper{
     // Insert, delete, read, update everything will be happened through DAOs
 
     public Dao<DRReceiptDb, Integer> getReceiptDao() throws SQLException {
-        if (receiptDao == null) {
-            receiptDao = getDao(DRReceiptDb.class);
+        String val = "receiptcondition";
+        boolean continueWhile = true;
+        while(continueWhile) {
+            switch(val) {
+                case "receiptcondition":
+                    if(receiptDao == null)
+                        val = "conditiontrue";
+                    else
+                        val = "conditionfalse";
+                    break;
+                case "conditiontrue":
+                    receiptDao = getDao(DRReceiptDb.class);
+                    val = "conditionfalse";
+                    break;
+                case "conditionfalse":
+                    continueWhile = false;
+                    break;
+                default:
+                    break;
+            }
         }
         return receiptDao;
     }
