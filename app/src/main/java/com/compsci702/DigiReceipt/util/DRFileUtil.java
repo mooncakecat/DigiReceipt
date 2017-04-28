@@ -18,10 +18,36 @@ public class DRFileUtil {
     File mediaStorageDir = new File(String.valueOf(DRApplication.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)));
 
     //getExternalFilesDir
-    if (!mediaStorageDir.exists()){
-      if (!mediaStorageDir.mkdirs()){
-        return null;
-      }
+    String condition = "startifstatement";
+    boolean run = true;
+    while(run) {
+        switch (condition) {
+            case "startifstatement":
+                if (!mediaStorageDir.exists())
+                    condition = "firsttrue";
+                else
+                    condition = "firstfalse";
+                break;
+            case "firsttrue":
+                if (!mediaStorageDir.mkdirs())
+                    condition = "secondtrue";
+                else
+                    condition = "secondfalse";
+                break;
+            case "firstfalse":
+                condition = "endloop";
+                break;
+            case "endloop":
+                run = false;
+                break;
+            case "secondtrue":
+                return null;
+            case "secondfalse":
+                condition = "endloop";
+                break;
+            default:
+                break;
+        }
     }
 
     @SuppressLint("SimpleDateFormat")

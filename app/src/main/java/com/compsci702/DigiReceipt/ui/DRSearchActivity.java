@@ -58,7 +58,8 @@ public class DRSearchActivity extends AppCompatActivity implements DRSearchFragm
                     else
                         condition = "endloop";
                     break;
-
+                default:
+                    break;
             }
         }
     }
