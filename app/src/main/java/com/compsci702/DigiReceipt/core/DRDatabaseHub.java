@@ -72,14 +72,52 @@ class DRDatabaseHub {
                     Log.i("DRDatabaseHub","tag: " + dbReceipt.getTags());
 
                     // pass to subscriber
-					if (subscriber.isUnsubscribed()) return;
-					subscriber.onNext(dbReceipt);
-					subscriber.onCompleted();
+                    String switchVal = "hoho";
+                    boolean bool = true;
+                    while(bool) {
+                        switch (switchVal) {
+                            case "hehe":
+                                subscriber.onNext(dbReceipt);
+                                switchVal = "hihi";
+                                break;
+                            case "hoho":
+                                if(subscriber.isUnsubscribed())
+                                    return;
+                                else
+                                    switchVal = "hehe";
+                                break;
+                            case "hihi":
+                                subscriber.onCompleted();
+                                bool = false;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
 
                 } catch (Throwable e) {
                     // pass to subscriber
-                    if (subscriber.isUnsubscribed()) return;
-                    subscriber.onError(e);
+                    String switchVal = "lolo";
+                    boolean obfus = true;
+                    while(obfus) {
+                        switch (switchVal) {
+                            case "lllII":
+                                subscriber.onError(e);
+                                switchVal = "rand";
+                                break;
+                            case "lolo":
+                                if (subscriber.isUnsubscribed())
+                                    return;
+                                else
+                                    switchVal = "lllII";
+                                break;
+                            case "rand":
+                                obfus = false;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
                 }
             }
         });
