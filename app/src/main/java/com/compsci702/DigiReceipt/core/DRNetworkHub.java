@@ -15,7 +15,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Scanner;
-
 import rx.Observable;
 import rx.Subscriber;
 
