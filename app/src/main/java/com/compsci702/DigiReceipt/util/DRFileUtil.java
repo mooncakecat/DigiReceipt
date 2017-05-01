@@ -1,7 +1,10 @@
 package com.compsci702.DigiReceipt.util;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
+import android.os.Build;
 import android.os.Environment;
+import android.util.Log;
 
 import com.compsci702.DigiReceipt.core.DRApplication;
 
@@ -15,8 +18,12 @@ import java.util.Date;
 public class DRFileUtil {
 
   public static File generateMediaFile(){
-    File mediaStorageDir = new File(String.valueOf(DRApplication.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)));
-
+    File mediaStorageDir = null;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      mediaStorageDir = new File(String.valueOf(DRApplication.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)));
+    }else{
+      mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "DigiReceipt");
+    }
     //getExternalFilesDir
     if (!mediaStorageDir.exists()){
       if (!mediaStorageDir.mkdirs()){
