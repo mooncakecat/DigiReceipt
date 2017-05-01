@@ -160,6 +160,7 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 			} else {
 				uri = Uri.fromFile(generateMediaFile());
 			}
+			Log.i("CHECKS",uri.toString());
 			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
 			startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 		}

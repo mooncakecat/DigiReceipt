@@ -34,7 +34,7 @@ public class DRNetworkHub {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             path = String.valueOf(DRApplication.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)) + "/";
         } else{
-            path = String.valueOf(DRApplication.getContext().getFilesDir()+"/DigiReceipt/");
+            path = String.valueOf(Environment.getExternalStorageDirectory()+"/DigiReceipt/");
         }
         path += filePath.split("/")[filePath.split("/").length-1];
 
