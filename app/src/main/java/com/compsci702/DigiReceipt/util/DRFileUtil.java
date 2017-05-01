@@ -19,10 +19,11 @@ public class DRFileUtil {
 
   public static File generateMediaFile(){
     File mediaStorageDir = null;
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
       mediaStorageDir = new File(String.valueOf(DRApplication.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)));
     }else{
-      mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "DigiReceipt");
+      mediaStorageDir = new File(DRApplication.getContext().getFilesDir(), "DigiReceipt");
+
     }
     //getExternalFilesDir
     if (!mediaStorageDir.exists()){

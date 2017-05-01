@@ -30,15 +30,14 @@ public class DRNetworkHub {
     static Gson gson = new Gson();
 
     private static byte[] readBytesFromFile(String filePath) {
-        Log.i("path",filePath);
         String path = "";
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             path = String.valueOf(DRApplication.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)) + "/";
-        }
-        else{
-            path = String.valueOf(Environment.getExternalStorageDirectory()+"/DigiReceipt/");
+        } else{
+            path = String.valueOf(DRApplication.getContext().getFilesDir()+"/DigiReceipt/");
         }
         path += filePath.split("/")[filePath.split("/").length-1];
+
         FileInputStream fileInputStream = null;
         byte[] bytesArray = null;
         try {

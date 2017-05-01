@@ -39,6 +39,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 import static com.compsci702.DigiReceipt.util.DRFileUtil.generateMediaFile;
 
 public class DRMainActivity extends AppCompatActivity implements DRMainFragment.FragmentListener,
@@ -153,13 +154,12 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 			//uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".fileprovider",
 			//		generateMediaFile());
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
 				uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".fileprovider",
 						generateMediaFile());
 			} else {
 				uri = Uri.fromFile(generateMediaFile());
 			}
-			Log.i("CHECK", uri.toString());
 			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
 			startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 		}
