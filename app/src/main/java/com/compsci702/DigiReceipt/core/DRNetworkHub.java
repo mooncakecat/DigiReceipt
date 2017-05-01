@@ -1,6 +1,8 @@
 package com.compsci702.DigiReceipt.core;
 
+import android.os.Build;
 import android.os.Environment;
+import android.util.Log;
 
 import com.compsci702.DigiReceipt.ui.model.DRReceiptTemp;
 import com.google.api.client.util.Base64;
@@ -28,7 +30,14 @@ public class DRNetworkHub {
     static Gson gson = new Gson();
 
     private static byte[] readBytesFromFile(String filePath) {
-        String path = String.valueOf(DRApplication.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)) + "/";
+        Log.i("path",filePath);
+        String path = "";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            path = String.valueOf(DRApplication.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)) + "/";
+        }
+        else{
+            path = String.valueOf(Environment.getExternalStorageDirectory()+"/DigiReceipt/");
+        }
         path += filePath.split("/")[filePath.split("/").length-1];
         FileInputStream fileInputStream = null;
         byte[] bytesArray = null;
