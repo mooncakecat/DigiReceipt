@@ -21,6 +21,7 @@ import rx.Observable;
 import rx.Subscriber;
 
 /**
+ * Class to request http post for text recognition from google
  * Network Hub.
  */
 public class DRNetworkHub {
@@ -29,16 +30,21 @@ public class DRNetworkHub {
     private static final String API_KEY = "key=AIzaSyBa8Ozp8y9v8NQixUMMDKX58a9dHQe4rSo";
     static Gson gson = new Gson();
 
+    /**
+     * Reads a file and outputs in byte[]
+     * @param filePath
+     * @return
+     */
     private static byte[] readBytesFromFile(String filePath) {
-        Log.i("path",filePath);
+
         String path = "";
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) { //Checks for SDK version
             path = String.valueOf(DRApplication.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)) + "/";
-        }
-        else{
-            path = String.valueOf(Environment.getExternalStorageDirectory()+"/DigiReceipt/");
+        } else{
+            path = String.valueOf(Environment.getExternalStorageDirectory()+"/");
         }
         path += filePath.split("/")[filePath.split("/").length-1];
+
         FileInputStream fileInputStream = null;
         byte[] bytesArray = null;
         try {
@@ -60,8 +66,15 @@ public class DRNetworkHub {
         return bytesArray;
     }
 
+    /**
+     * Method to do the http request
+     * @param filePath
+     * @return
+     * @throws Exception
+     */
     public static DRReceiptTemp sendPost(String filePath) throws Exception {
 
+        //Configuration
         byte[] fileContent = readBytesFromFile(filePath);
         URL serverUrl = new URL(TARGET_URL + API_KEY);
         URLConnection urlConnection = serverUrl.openConnection();
@@ -71,15 +84,21 @@ public class DRNetworkHub {
         httpConnection.setDoOutput(true);
         BufferedWriter httpRequestBodyWriter = new BufferedWriter(new
                 OutputStreamWriter(httpConnection.getOutputStream()));
+
+        //Sends the request
         httpRequestBodyWriter.write
                 ("{\"requests\":  [{ \"features\":  [ {\"type\": \"TEXT_DETECTION\""
                         +"}], \"image\": {\"content\": \"" + Base64.encodeBase64String(fileContent)+ "\"}}]}");
         httpRequestBodyWriter.close();
         String response = httpConnection.getResponseMessage();
+
+        //Check if the response is OK
         if (httpConnection.getInputStream() == null && !response.equals("OK")) {
             return null;
         }
         Scanner httpResponseScanner = new Scanner (httpConnection.getInputStream());
+
+        //Read all the text from the output
         String temp = "";
         while (httpResponseScanner.hasNext()) {
             String line = httpResponseScanner.nextLine();
@@ -87,6 +106,7 @@ public class DRNetworkHub {
                 temp = line;
             }
         }
+
         String[] tempArray = temp.split(":");
         if(tempArray.length > 1 && temp.contains("text")){
             temp = "";
@@ -99,6 +119,12 @@ public class DRNetworkHub {
         httpResponseScanner.close();
         return new DRReceiptTemp(temp);
     }
+
+    /**
+     * Method to set the communication between the main activity and the http request
+     * @param filePath
+     * @return
+     */
     public static rx.Observable<DRReceiptTemp> httpObservable(final String filePath){
         return Observable.create(new Observable.OnSubscribe<DRReceiptTemp>() {
             @Override
