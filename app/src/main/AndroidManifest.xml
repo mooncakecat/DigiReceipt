@@ -16,7 +16,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="com.compsci702.DigiReceipt.ui.DRMainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -24,11 +25,13 @@
         </activity>
         <activity
             android:name=".ui.DRSearchActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
       <activity
         android:name=".ui.DRImageActivity"
-        android:theme="@style/AppTheme.NoActionBar">
+        android:theme="@style/AppTheme.NoActionBar"
+        android:screenOrientation="portrait">
       </activity>
 
       <provider
