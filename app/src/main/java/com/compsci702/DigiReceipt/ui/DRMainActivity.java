@@ -16,7 +16,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.compsci702.DigiReceipt.BuildConfig;
@@ -46,61 +48,68 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
         DRViewReceiptsFragment.FragmentListener {
 
   	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  	 * internal fields
+       * internal fields
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	static final int REQUEST_IMAGE_CAPTURE = 1;
-	static final int REQUEST_CODE = 5;
-	
-	private static final String TAG = DRMainActivity.class.getSimpleName();
-	public static Uri uri = null;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_CODE = 5;
 
-	DRApplicationHub mApplicationHub = DRApplication.getApplicationHub();
-	private Subscription mAddReceiptSubscription;
-	
-	@BindView(R.id.fragment_container) FrameLayout mFragmentContainer;
-	@BindView(R.id.toolbar) Toolbar mToolbar;
+    private static final String TAG = DRMainActivity.class.getSimpleName();
+    public static Uri uri = null;
+
+    private ActivityState mState = ActivityState.INITIAL;
+
+    DRApplicationHub mApplicationHub = DRApplication.getApplicationHub();
+    private Subscription mAddReceiptSubscription;
+
+    @BindView(R.id.toolbar) Toolbar mToolbar;
+    @BindView(R.id.fragment_container) FrameLayout mFragmentContainer;
+    @BindView(R.id.loading_progress_indicator) ProgressBar mLoadingProgressIndicator;
+
+    private enum ActivityState {
+        INITIAL, LOADING, LOADED, ERROR
+    }
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * lifecycle methods
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	@Override protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+    @Override protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-		ButterKnife.bind(this);
+        ButterKnife.bind(this);
 
-		setSupportActionBar(mToolbar);
+        setSupportActionBar(mToolbar);
 
-		if (savedInstanceState == null) {
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.fragment_container, DRMainFragment.newInstance(), "DRMainFragment")
-					.commit();
-		}
-	}
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container, DRMainFragment.newInstance(), "DRMainFragment")
+                    .commit();
+        }
+    }
 
-	@Override protected void onStop() {
-		super.onStop();
-		cancelAddReceipt();
-	}
+    @Override protected void onStop() {
+        super.onStop();
+        cancelAddReceipt();
+    }
 
-	@Override public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater menuInflater = getMenuInflater();
-		menuInflater.inflate(R.menu.menu_main, menu);
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_main, menu);
 
-		return super.onCreateOptionsMenu(menu);
-	}
+        return super.onCreateOptionsMenu(menu);
+    }
 
-	@Override public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.search_icon:
-				DRSearchActivity.startActivity(this);
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.search_icon:
+                DRSearchActivity.startActivity(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * ui callbacks
@@ -109,29 +118,29 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
     /**
      * Asks for permission when it is 6.0 and above, then open up the camera
      */
-	@Override public void onAddReceiptSelected() {
-		if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager
-				.PERMISSION_GRANTED) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-				requestPermissions(new String[]{android.Manifest.permission.CAMERA, Manifest.permission
-						.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
-			}
-		} else {
-			dispatchTakePictureIntent();
-		}
-	}
+    @Override public void onAddReceiptSelected() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager
+                .PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{android.Manifest.permission.CAMERA, Manifest.permission
+                        .WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
+            }
+        } else {
+            dispatchTakePictureIntent();
+        }
+    }
 
-	@Override public void onViewReceiptsSelected() {
-		replaceFragment(DRViewReceiptsFragment.newInstance());
-	}
+    @Override public void onViewReceiptsSelected() {
+        replaceFragment(DRViewReceiptsFragment.newInstance());
+    }
 
-	@Override public void onReceiptSelected(String receiptFilename) {
-		DRImageActivity.startActivity(this, receiptFilename);
-	}
+    @Override public void onReceiptSelected(String receiptFilename) {
+        DRImageActivity.startActivity(this, receiptFilename);
+    }
 
-	@Override public void onAddReceiptTextViewSelected() {
-		onAddReceiptSelected();
-	}
+    @Override public void onAddReceiptTextViewSelected() {
+        onAddReceiptSelected();
+    }
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * permission requests
@@ -139,139 +148,162 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 
     /**
      * Method to be called when the user responded to the permission checks.
+     *
      * @param requestCode
      * @param permissions
      * @param grantResults
      */
-	@Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		if (requestCode == REQUEST_CODE) {
-			if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-				// Now user should be able to use camera
-				dispatchTakePictureIntent();
-			} else {
-				// Your app will not have this permission. Turn off all functions
-				// that require this permission or it will force close
-				Toast.makeText(this, R.string.permissions_error, Toast.LENGTH_LONG).show();
-			}
-		}
-	}
+    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Now user should be able to use camera
+                dispatchTakePictureIntent();
+            } else {
+                // Your app will not have this permission. Turn off all functions
+                // that require this permission or it will force close
+                Toast.makeText(this, R.string.permissions_error, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 
     /**
      * Sets the file path to be stored for the image from the camera, then opens the camera.
      */
-	private void dispatchTakePictureIntent() {
-		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-		// Ensure that there's a camera activity to handle the intent
-		if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 
-			if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-				uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".fileprovider",
-						generateMediaFile());
-			} else {
-				uri = Uri.fromFile(generateMediaFile());
-			}
-			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-			startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-		}
-	}
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".fileprovider",
+                        generateMediaFile());
+            } else {
+                uri = Uri.fromFile(generateMediaFile());
+            }
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
 
-	@Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-			try {
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            try {
                 getTextFromObservable(uri.toString());
             } catch (Exception e) {
                 Log.e(TAG, "Error: ", e);
             }
         }
-
-	}
+    }
 
     /**
      * Method to be called after the http request is done.
+     *
      * @param uriForFilePath
      */
-    private void getTextFromObservable(String uriForFilePath){
+    private void getTextFromObservable(String uriForFilePath) {
         DRNetworkHub.httpObservable(uriForFilePath).
                 subscribeOn(Schedulers.newThread()).
                 observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<DRReceiptTemp>() {
             @Override
             public void onCompleted() {
-
+                setstate(ActivityState.LOADED);
             }
 
             @Override
             public void onError(Throwable e) {
-				Log.e(TAG, "Error: ", e);
+                Log.e(TAG, "Error: ", e);
+                setstate(ActivityState.ERROR);
             }
 
             @Override
             public void onNext(DRReceiptTemp receipt) {
-				addReceipt(receipt);
+                addReceipt(receipt);
             }
         });
-
+        setstate(ActivityState.LOADING);
     }
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      * test for DB
    	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	private void cancelAddReceipt() {
-		if (mAddReceiptSubscription != null) mAddReceiptSubscription.unsubscribe();
-	}
+    private void cancelAddReceipt() {
+        if (mAddReceiptSubscription != null) mAddReceiptSubscription.unsubscribe();
+    }
 
     /**
      * Adds the receipt to the DB
+     *
      * @param receiptTemp
      */
-	private void addReceipt(final DRReceiptTemp receiptTemp){
-		
-		cancelAddReceipt();
-		
-		DRReceipt receipt = new DRReceipt() {
-			@Override public int getId() {
-				return 0;
-			}
+    private void addReceipt(final DRReceiptTemp receiptTemp) {
 
-			@NonNull @Override public String getFilename() {
-				return uri.toString();
-			}
+        cancelAddReceipt();
 
-			@Override public String getTags() {
-				return receiptTemp.getText();
-			}
-		};
-		
-		Observable<? extends DRReceipt> observable = mApplicationHub.addReceipt(receipt)
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread());
-		
-		mAddReceiptSubscription = observable.subscribe(new Observer<DRReceipt>() {
-			@Override public void onNext(DRReceipt receipt) {
-				Log.i(TAG, "Receipt added successfully: " + receipt);
-			}
+        DRReceipt receipt = new DRReceipt() {
+            @Override public int getId() {
+                return 0;
+            }
 
-			@Override public void onCompleted() {
-				// do nothing
-			}
+            @NonNull @Override public String getFilename() {
+                return uri.toString();
+            }
 
-			@Override public void onError(Throwable e) {
-				Log.e(TAG, "Error in addReceipt: ", e);
-			}
-		});
-	}
+            @Override public String getTags() {
+                return receiptTemp.getText();
+            }
+        };
+
+        Observable<? extends DRReceipt> observable = mApplicationHub.addReceipt(receipt)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        mAddReceiptSubscription = observable.subscribe(new Observer<DRReceipt>() {
+            @Override public void onNext(DRReceipt receipt) {
+                Log.i(TAG, "Receipt added successfully: " + receipt);
+            }
+
+            @Override public void onCompleted() {
+                setstate(ActivityState.LOADED);
+            }
+
+            @Override public void onError(Throwable e) {
+                Log.e(TAG, "Error in addReceipt: ", e);
+                setstate(ActivityState.ERROR);
+            }
+        });
+        setstate(ActivityState.LOADING);
+    }
 
 	
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * general methods
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	private void replaceFragment(DRBaseFragment fragment) {
-		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.fragment_container, fragment)
-				.addToBackStack(null)
-				.commit();
-	}
+    private void replaceFragment(DRBaseFragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private void setstate(ActivityState state) {
+        mState = state;
+        updateView();
+    }
+
+    private void updateView() {
+        mFragmentContainer.setVisibility(getContentVisible() ? View.VISIBLE : View.GONE);
+        mLoadingProgressIndicator.setVisibility(getLoadingIndicatorVisible() ? View.VISIBLE : View.GONE);
+    }
+
+    private boolean getContentVisible() {
+        return mState == ActivityState.LOADED || mState == ActivityState.INITIAL;
+    }
+
+    private boolean getLoadingIndicatorVisible() {
+        return mState == ActivityState.LOADING;
+    }
 }
