@@ -1,9 +1,11 @@
 package com.compsci702.DigiReceipt.ui;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -45,19 +47,21 @@ import static com.compsci702.DigiReceipt.util.DRFileUtil.generateMediaFile;
 public class DRMainActivity extends AppCompatActivity implements DRMainFragment.FragmentListener,
         DRViewReceiptsFragment.FragmentListener {
 
+	private ProgressDialog progressDialog;
+
   	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   	 * internal fields
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	static final int REQUEST_IMAGE_CAPTURE = 1;
 	static final int REQUEST_CODE = 5;
-	
+
 	private static final String TAG = DRMainActivity.class.getSimpleName();
 	public static Uri uri = null;
 
 	DRApplicationHub mApplicationHub = DRApplication.getApplicationHub();
 	private Subscription mAddReceiptSubscription;
-	
+
 	@BindView(R.id.fragment_container) FrameLayout mFragmentContainer;
 	@BindView(R.id.toolbar) Toolbar mToolbar;
 
@@ -224,9 +228,15 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
      * @param receiptTemp
      */
 	private void addReceipt(final DRReceiptTemp receiptTemp){
-		
+
 		cancelAddReceipt();
-		
+
+		progressDialog = new ProgressDialog(DRMainActivity.this);
+		progressDialog.setTitle("Creating account");
+		progressDialog.setMessage("Please wait...");
+		progressDialog.setCancelable(false);
+		progressDialog.show();
+
 		DRReceipt receipt = new DRReceipt() {
 			@Override public int getId() {
 				return 0;
@@ -240,27 +250,13 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 				return receiptTemp.getText();
 			}
 		};
-		
-		Observable<? extends DRReceipt> observable = mApplicationHub.addReceipt(receipt)
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread());
-		
-		mAddReceiptSubscription = observable.subscribe(new Observer<DRReceipt>() {
-			@Override public void onNext(DRReceipt receipt) {
-				Log.i(TAG, "Receipt added successfully: " + receipt);
-			}
 
-			@Override public void onCompleted() {
-				// do nothing
-			}
+		new AddReceipt().execute(new DRReceipt[] {receipt});
 
-			@Override public void onError(Throwable e) {
-				Log.e(TAG, "Error in addReceipt: ", e);
-			}
-		});
+
 	}
 
-	
+
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * general methods
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -270,5 +266,35 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 				.replace(R.id.fragment_container, fragment)
 				.addToBackStack(null)
 				.commit();
+	}
+
+	private class AddReceipt extends AsyncTask<DRReceipt, Void, Void> {
+
+		@Override
+		protected void onPostExecute(Void result) {
+			progressDialog.dismiss();
+		}
+
+		@Override
+		protected Void doInBackground(DRReceipt... params) {
+			Observable<? extends DRReceipt> observable = mApplicationHub.addReceipt(params[0])
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread());
+
+			mAddReceiptSubscription = observable.subscribe(new Observer<DRReceipt>() {
+				@Override public void onNext(DRReceipt receipt) {
+					Log.i(TAG, "Receipt added successfully: " + receipt);
+				}
+
+				@Override public void onCompleted() {
+					// do nothing
+				}
+
+				@Override public void onError(Throwable e) {
+					Log.e(TAG, "Error in addReceipt: ", e);
+				}
+			});
+			return null;
+		}
 	}
 }
