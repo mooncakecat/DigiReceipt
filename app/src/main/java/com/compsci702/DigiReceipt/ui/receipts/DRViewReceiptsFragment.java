@@ -8,6 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.compsci702.DigiReceipt.R;
 import com.compsci702.DigiReceipt.core.DRApplication;
@@ -20,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
@@ -27,27 +31,37 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
- * Display a list of digitalised receipts
+ * Display a list of receipts
  */
 public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragment.FragmentListener> implements
 		DRReceiptsRecyclerViewAdapter.AdapterListener {
+
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * FragmentListener
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	public interface FragmentListener {
-
 		void onReceiptSelected(String receiptFilename);
+		void onAddReceiptTextViewSelected();
 	}
+
+	private static final int GRID_COLUMNS = 2;
+
 	DRApplicationHub mApplicationHub = DRApplication.getApplicationHub();
 	private Subscription mReceiptsSubscription;
 
-	private static final int GRID_COLUMNS = 2;
+	private State mFragmentState = State.INITIAL;
 
 	private DRReceiptsRecyclerViewAdapter mAdapter;
 	private final List<DRReceipt> mReceipts = new ArrayList<>();
 
 	@BindView(R.id.recyclerview) RecyclerView mRecyclerView;
+	@BindView(R.id.loading_progress_indicator) ProgressBar mLoadingProgressIndicator;
+	@BindView(R.id.empty_recycler_view) LinearLayout mEmptyRecyclerViewLayout;
+
+	private enum State{
+		INITIAL, LOADING, LOADED, ERROR;
+	}
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * new instance
@@ -86,6 +100,37 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 		cancelRequestReceipts();
 	}
 
+	private void setState(State state) {
+		mFragmentState = state;
+		updateView();
+	}
+
+	@OnClick(R.id.add_receipt_text_view) void onAddReceiptTextViewSelected(){
+		mListener.onAddReceiptTextViewSelected();
+	}
+
+	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   	 * general methods
+   	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+	@Override protected void updateView() {
+		mRecyclerView.setVisibility(getContentVisible() ? View.VISIBLE : View.GONE);
+		mLoadingProgressIndicator.setVisibility(getLoadingIndicatorVisible() ? View.VISIBLE : View.GONE);
+		mEmptyRecyclerViewLayout.setVisibility(getNoReceiptsVisible() ? View.VISIBLE : View.GONE);
+	}
+
+	private boolean getContentVisible() {
+		return mFragmentState == State.LOADED && !mReceipts.isEmpty();
+	}
+
+	private boolean getLoadingIndicatorVisible() {
+		return mFragmentState == State.LOADING;
+	}
+
+	private boolean getNoReceiptsVisible() {
+		return (mFragmentState == State.LOADED || mFragmentState == State.INITIAL) && mReceipts.isEmpty();
+	}
+
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   	 * request receipts
   	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -111,13 +156,14 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 			}
 
 			@Override public void onCompleted() {
-
+				setState(State.LOADED);
 			}
 
 			@Override public void onError(Throwable e) {
-				Log.e("Something", "Error: ", e);
+				setState(State.ERROR);
 			}
 		});
+		setState(State.LOADING);
 	}
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -127,16 +173,13 @@ public class DRViewReceiptsFragment extends DRBaseFragment<DRViewReceiptsFragmen
 	@Override public void onReceiptSelected(String receiptFilename) {
 		mListener.onReceiptSelected(receiptFilename);
 	}
-	
+
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	 * base class overrides
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	@NonNull @Override protected Class getFragmentListenerClass() {
 		return FragmentListener.class;
-	}
-
-	@Override protected void updateView() {
 	}
 
 	@NonNull @Override public String getScreenTitle() {

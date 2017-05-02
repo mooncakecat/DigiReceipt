@@ -16,4 +16,6 @@
   <string name="permissions_error">Permissions Error</string>
   <string name="image_saved">Image saved!</string>
 
+  <!-- View Receipts -->
+  <string name="no_receipts">You currently don\'t have any receipts.</string>
 </resources>

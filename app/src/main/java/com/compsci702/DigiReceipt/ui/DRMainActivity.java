@@ -130,6 +130,10 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 		DRImageActivity.startActivity(this, receiptFilename);
 	}
 
+	@Override public void onAddReceiptTextViewSelected() {
+		onAddReceiptSelected();
+	}
+
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * permission requests
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
