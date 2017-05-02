@@ -107,6 +107,9 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
    * ui callbacks
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+    /**
+     * Asks for permission when it is 6.0 and above, then open up the camera
+     */
 	@Override public void onAddReceiptSelected() {
 		if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager
 				.PERMISSION_GRANTED) {
@@ -131,6 +134,12 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
    * permission requests
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+    /**
+     * Method to be called when the user responded to the permission checks.
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
 	@Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		if (requestCode == REQUEST_CODE) {
@@ -145,14 +154,14 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 		}
 	}
 
+    /**
+     * Sets the file path to be stored for the image from the camera, then opens the camera.
+     */
 	private void dispatchTakePictureIntent() {
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
 		// Ensure that there's a camera activity to handle the intent
 		if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-			// This causes crashes on api 24 and above: Uri pictureURI = Uri.fromFile(generateMediaFile());
-			//uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".fileprovider",
-			//		generateMediaFile());
 
 			if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
 				uri = FileProvider.getUriForFile(getApplicationContext(), BuildConfig.APPLICATION_ID + ".fileprovider",
@@ -160,7 +169,6 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 			} else {
 				uri = Uri.fromFile(generateMediaFile());
 			}
-			Log.i("CHECKS",uri.toString());
 			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
 			startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 		}
@@ -176,6 +184,11 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
         }
 
 	}
+
+    /**
+     * Method to be called after the http request is done.
+     * @param uriForFilePath
+     */
     private void getTextFromObservable(String uriForFilePath){
         DRNetworkHub.httpObservable(uriForFilePath).
                 subscribeOn(Schedulers.newThread()).
@@ -206,6 +219,10 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 		if (mAddReceiptSubscription != null) mAddReceiptSubscription.unsubscribe();
 	}
 
+    /**
+     * Adds the receipt to the DB
+     * @param receiptTemp
+     */
 	private void addReceipt(final DRReceiptTemp receiptTemp){
 		
 		cancelAddReceipt();
