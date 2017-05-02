@@ -61,7 +61,6 @@ public class DRMainActivity extends AppCompatActivity implements DRMainFragment.
 	@BindView(R.id.fragment_container) FrameLayout mFragmentContainer;
 	@BindView(R.id.toolbar) Toolbar mToolbar;
 
-
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    * lifecycle methods
    * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
