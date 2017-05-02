@@ -21,4 +21,10 @@
   <!-- loading progress indicator -->
     <style name="AppTheme.ProgressBar"><item name="colorAccent">@color/colorPrimary</item></style>
 
+    <style name="AppTheme.SearchView">
+        <!--<item name="colorControlNormal">@color/colorPrimary</item>-->
+        <item name="colorControlActivated">@color/colorPrimary</item> // change this color to the required cursor color your need.
+        <!--<item name="colorControlHighlight">@color/colorPrimary</item>-->
+    </style>
+
 </resources>
